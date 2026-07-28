@@ -14,3 +14,13 @@ add more maps (cave done, lab done, city next?)
 change explosive to kamikize --------------------------------------------------- DONE
 red potion: gun shoots faster and damage is higher (red outline around screen)
 blue potion: time slower (blue outline around screen)
+shotgun weapon
+e and q to cycle between weapons
+pop up to show which weapon was selected
+random events (heavy swarm incoming, fast swarm incoming etc.)
+weapon upgrades maybe?
+update rocket icon
+hard mode, easy mode, medium mode
+endless mode, wave mode - PRIORITY
+press enter to restart
+mutatins (every 30 kills: pick a modifier like 30% rifle damage, but rifle bullets cost 2 focus etc.)
