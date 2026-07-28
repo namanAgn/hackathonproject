@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Project Singularity</title>
+        <link rel="stylesheet" href="style.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <!--
+            <div class="cover-page">
+                <img src="./assets/coverpage.png">
+            </div>
+            
+            <button class="play-button">Play</button>
+        -->
+         
+
+        <div class="pause">
+            <img src="./assets/pause.svg">
+        </div>
+
+        <div class="score">
+            Score: <span class="score-amount">0</span>
+        </div>
+
+        <div class="displays">
+            <div class="left">
+                <div class="health-display">Health:</div>
+                <div class="focus-display">Focus:</div>
+            </div>
+            <div class="middle">w
+                <div class="health-bar"></div>
+                <div class="focus-bar"></div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="tool rifle">
+                <p class="cost">2 Focus</p>
+                <img src="./assets/rifle.svg">
+                <p class="name"> [1] Kinetic Rifle</p>
+            </div>
+            <div class="tool rocket">
+                <p class="cost">10 Focus</p>
+                <img src="./assets/land-mine.svg">
+                <p class="name"> [2] Rocket</p>
+            </div>
+            <div class="tool orb">
+                <p class="cost">45 Focus</p>
+                <img src="./assets/orbital.svg">
+                <p class="name"> [3] Gravity Orb</p>
+            </div>
+            <div class="tool well">
+                <p class="cost">100 Focus</p>
+                <img src="./assets/well.svg">
+                <p class="name"> [4] Gravity Well</p>
+            </div>
+        </div>
+
+        <canvas id="c"></canvas>
+        <script src="./scripts/main.js" type="module"></script>
+    </body>
+</html>
