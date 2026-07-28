@@ -241,6 +241,12 @@ export function updateBullets(map) {
                             spawnEnemyPredefined(enemy.x, enemy.y, "regular");
                             spawnEnemyPredefined(enemy.x - 50, enemy.y, "fast");
                             spawnEnemyPredefined(enemy.x + 50, enemy.y, "fast");
+                        } else if (enemy.type === "splitter4") {
+                            spawnEnemyPredefined(enemy.x, enemy.y, "fast");
+                            spawnEnemyPredefined(enemy.x, enemy.y, "fast");
+                            spawnEnemyPredefined(enemy.x, enemy.y, "fast");
+                            spawnEnemyPredefined(enemy.x - 50, enemy.y, "sniper");
+                            spawnEnemyPredefined(enemy.x + 50, enemy.y, "sniper");
                         }
                         
                         if (enemy.type === "explosive") {

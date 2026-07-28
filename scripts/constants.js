@@ -83,16 +83,17 @@ export const ENEMY_CONFIGS = {
   splitter1: { health: 100, speed: 4, damage: 15, w: GRID_SIZE * 0.65, h: GRID_SIZE * 0.65, color: "#efde21", attackCooldown: 0.8, focusReward: 30, scoreReward: 20, gravityResistance: 0.9, knockbackResistance: 0.8 },
   splitter2: { health: 170, speed: 3, damage: 26, w: GRID_SIZE * 0.8, h: GRID_SIZE * 0.8, color: "#6a1f1f", attackCooldown: 1, focusReward: 40, scoreReward: 25, gravityResistance: 1.5, knockbackResistance: 1.4 },
   splitter3: { health: 150, speed: 3, damage: 34, w: GRID_SIZE * 0.95, h: GRID_SIZE * 0.95, color: "#51dddd", attackCooldown: 1.5, focusReward: 60, scoreReward: 40, gravityResistance: 2.2, knockbackResistance: 2 },
+  splitter4: { health: 80, speed: 2.5, damage: 45, w: GRID_SIZE * 1, h: GRID_SIZE * 0.7, color: "#c44dff", attackCooldown: 1.5, focusReward: 60, scoreReward: 25, gravityResistance: 2.2, knockbackResistance: 2 },
   explosive: { health: 100, speed: 5, damage: 8, w: GRID_SIZE * 0.5, h: GRID_SIZE * 0.5, color: "#2a2a2a", attackCooldown: 0.5, explosiveRadius: 200, explosiveDamage: 45, focusReward: 30, scoreReward: 20, gravityResistance: 0.8, knockbackResistance: 0.6 },
   sniper: {
-      health: 60,
-      speed: 1.4,
-      w: GRID_SIZE * 0.42,
-      h: GRID_SIZE * 0.42,
+      health: 95,
+      speed: 2.4,
+      w: GRID_SIZE * 0.9,
+      h: GRID_SIZE * 0.6,   
       color: "#c44dff",
 
-      damage: 28,
-      attackCooldown: 1, // unused by sniper (it has its own aim/cooldown state machine), kept for schema parity
+      damage: 40,
+      attackCooldown: 0.75, // unused by sniper (it has its own aim/cooldown state machine), kept for schema parity
       focusReward: 45,
       scoreReward: 35,
       gravityResistance: 1.1,

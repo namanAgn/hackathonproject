@@ -139,6 +139,9 @@ export function explode(x, y, radius = 280, damage = 160, options = {}) {
                 spawnEnemyPredefined(enemy.x, enemy.y, "regular");
                 spawnEnemyPredefined(enemy.x - 50, enemy.y, "fast");
                 spawnEnemyPredefined(enemy.x + 50, enemy.y, "fast");
+            } else if (enemy.type === "splitter4") {
+                spawnEnemyPredefined(enemy.x - 50, enemy.y, "sniper");
+                spawnEnemyPredefined(enemy.x + 50, enemy.y, "sniper");
             }
 
             state.enemies.splice(i, 1);

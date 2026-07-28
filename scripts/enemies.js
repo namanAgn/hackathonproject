@@ -60,14 +60,15 @@ function applySniperFields(enemy, cfg) {
 export function spawnEnemy() {
     let type;
     const r = Math.random();
-    if (r < 0.45) type = "regular";
-    else if (r < 0.70) type = "fast";
-    else if (r < 0.75) type = "sniper";
-    else if (r < 0.83) type = "explosive";
-    else if (r < 0.88) type = "splitter1";
-    else if (r < 0.94) type = "splitter2";
-    else if (r < 0.97) type = "splitter3";
-    else type = "heavy";
+    if (r < 0.35) type = "splitter4";        // 40%
+    else if (r < 0.65) type = "fast";      // 28%
+    else if (r < 0.73) type = "sniper";    // 5%
+    else if (r < 0.76) type = "explosive"; // 3%
+    else if (r < 0.81) type = "splitter1"; // 5%
+    else if (r < 0.86) type = "splitter2"; // 5%
+    else if (r < 0.88) type = "splitter3"; // 2%
+    else if (r < 0.92) type = "splitter4"; // 4%
+    else type = "heavy";                   // 8%
     const cfg = C.ENEMY_CONFIGS[type];
     const openTiles = [];
     for (let y1 = 0; y1 < state.map.length; y1++) {
@@ -454,7 +455,8 @@ export function traceEnemyShape(enemy, w, h, ctx) {
         }
         case "splitter1":
         case "splitter2":
-        case "splitter3": {
+        case "splitter3":
+        case "splitter4": {
             const scale = 1.35;
             const rx = (w / 2) * scale, ry = (h / 2) * scale;
             ctx.beginPath();
