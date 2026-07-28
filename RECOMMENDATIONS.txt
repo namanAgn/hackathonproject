@@ -3,7 +3,7 @@ add an explosive barrel (reuse rpg) --------------------------------------------
 excess focus gets turned into a highscore -------------------------------------- DONE
 enemies drop a health regen thing ---------------------------------------------- DONE
 unify ui color scheme ---------------------------------------------------------- DONE
-sniper enemy type (shooter but slower and farther)
+sniper enemy type (shooter but slower and farther) ----------------------------- DONE   
 exploding enemy type ----------------------------------------------------------- DONE
 make drops get removed after a while ------------------------------------------- DONE
 cooldown for well spawning ----------------------------------------------------- DONE
@@ -12,8 +12,5 @@ stats on game over screen ------------------------------------------------------
 improve game over screen ------------------------------------------------------- DONE
 add more maps (cave done, lab done, city next?)
 change explosive to kamikize --------------------------------------------------- DONE
-red potion: gun shoots faster and damage is higher (purple outline around screen)
+red potion: gun shoots faster and damage is higher (red outline around screen)
 blue potion: time slower (blue outline around screen)
-get 10/10 kills: get red potion
-get 25/25 kills: get blue potion
-orbit field weapon: enemies spin around in the players influence and slowly take damage

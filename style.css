@@ -51,7 +51,7 @@ canvas {
     top: 55px;
     left: 15px;
     gap: 10px;
-    width: 371px;
+    width: 465px;
     padding: 12px;
 }
 
@@ -129,6 +129,7 @@ canvas {
 
 .right {
     font-size: 24px;
+    font-weight: 600;
     font-family: var(--font-body);
     color: var(--text);
 }

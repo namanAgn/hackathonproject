@@ -63,9 +63,14 @@ export function incrementTime() {
     state.time += 0.01;
 }
 
+const healthAmount = document.querySelector(".health-amount");
+const focusAmount = document.querySelector(".focus-amount");
+
 function updateDisplays() {
     if (healthBar) healthBar.style.width = `${state.player.health}px`;
     if (focusBar) focusBar.style.width = `${state.focusCurrency}px`;
+    if (healthAmount) healthAmount.textContent = `${state.player.health}/${C.MAX_HEALTH}`;
+    if (focusAmount) focusAmount.textContent = `${Math.min(state.focusCurrency, C.MAX_FOCUS)}/${C.MAX_FOCUS}`;
     if (scoreBar) scoreBar.textContent = state.score;
 }
 
@@ -352,17 +357,12 @@ function draw() {
         drawGameOverScreen();
     }
     if (state.gamePaused) {
-        ctx.save();
-        ctx.strokeStyle = "#ff0000";
-        ctx.lineWidth = 10;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(canvas.width, 0);
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        ctx.font = `Bold 96px Arial`;
+        ctx.fillStyle = "#fff";
+        ctx.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
     }
 }
 

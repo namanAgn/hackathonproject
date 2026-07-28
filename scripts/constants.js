@@ -92,7 +92,7 @@ export const ENEMY_CONFIGS = {
       h: GRID_SIZE * 0.6,   
       color: "#c44dff",
 
-      damage: 40,
+      damage: 60,
       attackCooldown: 0.75, // unused by sniper (it has its own aim/cooldown state machine), kept for schema parity
       focusReward: 45,
       scoreReward: 35,
