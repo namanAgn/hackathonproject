@@ -60,7 +60,7 @@ function applySniperFields(enemy, cfg) {
 export function spawnEnemy() {
     let type;
     const r = Math.random();
-    if (r < 0.35) type = "splitter4";        // 40%
+    if (r < 0.35) type = "regular";        // 40%
     else if (r < 0.65) type = "fast";      // 28%
     else if (r < 0.73) type = "sniper";    // 5%
     else if (r < 0.76) type = "explosive"; // 3%
