@@ -127,6 +127,15 @@ function regenFocus() {
     }
 }
 
+function regenHealth() {
+    if (state.time >= state.nextHealthRegenerationTime) {
+        if (state.player.health > 0 && state.player.health < C.MAX_HEALTH) {
+            state.player.health = Math.min(state.player.health + C.HEALTH_REGEN_AMOUNT, C.MAX_HEALTH);
+        }
+        state.nextHealthRegenerationTime = state.time + C.HEALTH_REGEN_COOLDONW;
+    }
+}
+
 function updateDeathParticles() {
     for (let i = state.deathParticles.length - 1; i >= 0; i--) {
         const p = state.deathParticles[i];
@@ -250,6 +259,7 @@ function drawBullets(ctx) { Bullets.drawBullets(ctx); }
 function update() {
     if (!state.gameOver && !state.gamePaused) {
         regenFocus();
+        regenHealth();
         Player.updatePlayer();
         Player.aimPlayer();
         updateDeathParticles();
@@ -261,6 +271,7 @@ function update() {
         Player.spawnTool();
         updateBarrels();
         Bullets.updateBullets(state.map);
+        Enemies.updateEnemyBullets();
         Map.updateWells();
         Bullets.updateOrbs();
         updateDisplays();
@@ -327,6 +338,7 @@ function draw() {
     drawGrid(canvas);
     Map.drawMap(state.map, ctx);
     drawBullets(ctx);
+    Enemies.drawEnemyBullets(ctx);
     drawWells(ctx);
     Map.drawGhostWell(ctx);
     drawEnemies(ctx);

@@ -3,6 +3,7 @@ import * as C from './constants.js';
 import { state } from './state.js';
 import { explode } from './explosions.js';
 import { gridToWorld, worldToGrid, findPath } from './map.js';
+import { worldToScreen } from './utils.js';
 
 export function spawnEnemyPredefined(x, y, type) {
     const cfg = C.ENEMY_CONFIGS[type];
@@ -37,20 +38,36 @@ export function spawnEnemyPredefined(x, y, type) {
         enemy.explosiveRadius = C.ENEMY_CONFIGS[enemy.type].explosiveRadius;
         enemy.explosiveDamage = C.ENEMY_CONFIGS[enemy.type].explosiveDamage;
     }
+    if (enemy.type === "sniper") applySniperFields(enemy, cfg);
     state.enemies.push(enemy);
+}
+
+function applySniperFields(enemy, cfg) {
+    enemy.state = "move";
+    enemy.aimTimer = 0;
+    enemy.aimAngle = enemy.angle;
+    enemy.cooldownTimer = 0;
+    enemy.preferredDistance = cfg.preferredDistance;
+    enemy.retreatDistance = cfg.retreatDistance;
+    enemy.aimTime = cfg.aimTime;
+    enemy.cooldown = cfg.cooldown; // frame-based cooldown, overrides the generic attackCooldown value
+    enemy.bulletSpeed = cfg.bulletSpeed;
+    enemy.bulletLife = cfg.bulletLife;
+    enemy.bulletRadius = cfg.bulletRadius;
+    enemy.laserColor = cfg.laserColor;
 }
 
 export function spawnEnemy() {
     let type;
     const r = Math.random();
-    if (r < 0.35) type = "regular";
-    else if (r < 0.55) type = "fast";
-    else if (r < 0.70) type = "explosive";
-    else if (r < 0.78) type = "splitter1";
-    else if (r < 0.85) type = "splitter2";
-    else if (r < 0.91) type = "splitter3";
-    else if (r < 0.97) type = "heavy";
-    else type = "regular";
+    if (r < 0.45) type = "regular";
+    else if (r < 0.70) type = "fast";
+    else if (r < 0.75) type = "sniper";
+    else if (r < 0.83) type = "explosive";
+    else if (r < 0.88) type = "splitter1";
+    else if (r < 0.94) type = "splitter2";
+    else if (r < 0.97) type = "splitter3";
+    else type = "heavy";
     const cfg = C.ENEMY_CONFIGS[type];
     const openTiles = [];
     for (let y1 = 0; y1 < state.map.length; y1++) {
@@ -107,15 +124,155 @@ export function spawnEnemy() {
         path: [],
         pathTimer: 0
     };
+
     if (enemy.type === "explosive") {
         enemy.explosiveRadius = C.ENEMY_CONFIGS[enemy.type].explosiveRadius;
         enemy.explosiveDamage = C.ENEMY_CONFIGS[enemy.type].explosiveDamage;
     }
+
+    if (enemy.type === "sniper") applySniperFields(enemy, cfg);
     state.enemies.push(enemy);
 }
 
+function updateSniper(enemy, pCenter) {
+    const ex = enemy.x + enemy.w / 2;
+    const ey = enemy.y + enemy.h / 2;
+    const dx = pCenter.x - ex;
+    const dy = pCenter.y - ey;
+    const dist = Math.hypot(dx, dy) || 1;
+
+    const nx = dx / dist;
+    const ny = dy / dist;
+
+    enemy.angle = Math.atan2(dy, dx);
+    if (enemy.hitFlash > 0) enemy.hitFlash -= 0.01;
+
+    const tryMove = (mx, my) => {
+        enemy.x += mx;
+        if (checkEntityTileCollision(enemy)) enemy.x -= mx;
+        enemy.y += my;
+        if (checkEntityTileCollision(enemy)) enemy.y -= my;
+    };
+
+    switch (enemy.state) {
+
+        // Stay roughly at preferred distance
+        case "move": {
+            if (dist > enemy.preferredDistance + 40) {
+                tryMove(nx * enemy.speed, ny * enemy.speed);
+            }
+            else if (dist < enemy.retreatDistance) {
+                tryMove(-nx * enemy.speed, -ny * enemy.speed);
+            }
+            else {
+                enemy.state = "aim";
+                enemy.aimTimer = enemy.aimTime;
+            }
+            break;
+        }
+
+        // Stand still while aiming, unless the player closes the distance
+        case "aim": {
+            if (dist < enemy.retreatDistance * 0.7) {
+                enemy.state = "move";
+                break;
+            }
+            enemy.aimAngle = Math.atan2(dy, dx);
+            enemy.aimTimer--;
+            if (enemy.aimTimer <= 0) {
+                fireEnemyBullet(
+                    ex,
+                    ey,
+                    enemy.aimAngle,
+                    enemy.bulletSpeed,
+                    enemy.damage,
+                    enemy.bulletLife,
+                    enemy.bulletRadius
+                );
+
+                enemy.state = "cooldown";
+                enemy.cooldownTimer = enemy.cooldown;
+            }
+            break;
+        }
+
+        case "cooldown": {
+            enemy.cooldownTimer--;
+            tryMove(-nx * enemy.speed * 0.6, -ny * enemy.speed * 0.6);
+            if (enemy.cooldownTimer <= 0) {
+                enemy.state = "move";
+            }
+            break;
+        }
+    }
+}
+
+export function fireEnemyBullet(x, y, angle, speed, damage, life = 120, radius = 4) {
+    state.enemyBullets.push({
+        x,
+        y,
+        damage,
+        life,
+        radius,
+
+        velocity: {
+            x: Math.cos(angle) * speed,
+            y: Math.sin(angle) * speed
+        }
+    });
+}
+
+export function drawEnemyBullets(ctx) {
+    for (const bullet of state.enemyBullets) {
+        const screen = worldToScreen(bullet.x, bullet.y);
+
+        ctx.beginPath();
+        ctx.fillStyle = "#ff4444";
+        ctx.arc(
+            screen.x,
+            screen.y,
+            (bullet.radius || 4) * state.camera.scale,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+    }
+}
+
+export function updateEnemyBullets() {
+    for (let i = state.enemyBullets.length - 1; i >= 0; i--) {
+
+        const bullet = state.enemyBullets[i];
+
+        bullet.x += bullet.velocity.x;
+        bullet.y += bullet.velocity.y;
+
+        bullet.life--;
+
+        if (bullet.life <= 0) {
+            state.enemyBullets.splice(i, 1);
+            continue;
+        }
+
+        // Player collision
+        const px = state.player.x + state.player.w / 2;
+        const py = state.player.y + state.player.h / 2;
+
+        const dx = bullet.x - px;
+        const dy = bullet.y - py;
+
+        if (dx * dx + dy * dy < 18 * 18) {
+
+            state.player.health -= bullet.damage;
+            state.player.hitFlash = 0.2;
+
+            state.enemyBullets.splice(i, 1);
+        }
+    }
+}
+
 export function spawnEnemies() {
-    if (state.enemies.length <= 35 && state.time >= state.nextEnemySpawnTime && state.enableSpawnEnemies) {
+    if (state.enemies.length <= C.MAX_ENEMIES && state.time >= state.nextEnemySpawnTime && state.enableSpawnEnemies) {
         spawnEnemy();
         state.nextEnemySpawnTime = state.time + C.ENEMY_SPAWN_COOLDOWN;
     }
@@ -179,6 +336,10 @@ export function updateEnemies() {
     const pCenter = { x: state.player.x + state.player.w / 2, y: state.player.y + state.player.h / 2 };
     const playerGrid = worldToGrid(pCenter.x, pCenter.y);
     state.enemies.forEach((enemy) => {
+        if (enemy.type === "sniper") {
+            updateSniper(enemy, pCenter);
+            return;
+        }
         const ex = enemy.x + enemy.w / 2;
         const ey = enemy.y + enemy.h / 2;
         const distToPlayer = Math.hypot(pCenter.x - ex, pCenter.y - ey);
@@ -187,7 +348,7 @@ export function updateEnemies() {
                 state.player.hitFlash = 0.1;
                 state.damageReceived += enemy.damage;
                 enemy.nextAttack = state.time + enemy.cooldown;
-                explode(enemy.x, enemy.x, enemy.explosiveRadius, enemy.explosiveDamage);
+                explode(enemy.x + enemy.w / 2, enemy.y + enemy.h / 2, enemy.explosiveRadius, enemy.explosiveDamage);
                 return;
             }
 
@@ -304,6 +465,18 @@ export function traceEnemyShape(enemy, w, h, ctx) {
             ctx.closePath();
             break;
         }
+        case "sniper": {
+            // long, thin, barrel-like silhouette pointing toward its facing angle
+            const rx = w / 2, ry = h / 2;
+            ctx.beginPath();
+            ctx.moveTo(rx * 1.5, 0);
+            ctx.lineTo(rx * 0.15, -ry * 0.85);
+            ctx.lineTo(-rx, -ry * 0.45);
+            ctx.lineTo(-rx, ry * 0.45);
+            ctx.lineTo(rx * 0.15, ry * 0.85);
+            ctx.closePath();
+            break;
+        }
         default: {
             const radius = Math.min(w, h) * 0.18;
             // draw rounded rectangle path
@@ -318,6 +491,26 @@ export function traceEnemyShape(enemy, w, h, ctx) {
             break;
         }
     }
+}
+
+function drawSniperLaser(enemy, ctx) {
+    const ex = enemy.x + enemy.w / 2;
+    const ey = enemy.y + enemy.h / 2;
+    const start = worldToScreen(ex, ey);
+    const end = worldToScreen(
+        state.player.x + state.player.w / 2,
+        state.player.y + state.player.h / 2
+    );
+    const pct = 1 - Math.max(0, enemy.aimTimer) / enemy.aimTime; // laser intensifies as the shot charges up
+    ctx.save();
+    ctx.strokeStyle = enemy.laserColor || "#ff3b3b";
+    ctx.globalAlpha = 0.25 + pct * 0.6;
+    ctx.lineWidth = (1 + pct * 2) * state.camera.scale;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+    ctx.restore();
 }
 
 export function drawEnemyBody(enemy, ctx) {
@@ -360,6 +553,9 @@ export function drawEnemyHealthBar(enemy, ctx) {
 
 export function drawEnemies(ctx) {
     state.enemies.forEach(enemy => {
+        if (enemy.type === "sniper" && enemy.state === "aim") {
+            drawSniperLaser(enemy, ctx);
+        }
         drawEnemyBody(enemy, ctx);
         drawEnemyHealthBar(enemy, ctx);
     });

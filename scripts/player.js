@@ -137,14 +137,11 @@ export function drawPlayer(ctx) {
         ctx.fillRect(-w/2 - 8, -h/2 - 8, w + 16, h + 16);
         ctx.restore();
     }
-    const grad = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-    grad.addColorStop(0, "#44ff00");
-    grad.addColorStop(1, "#5fc14d");
-    ctx.fillStyle = grad;
+    ctx.fillStyle = "#fff";
     // draw player body
     ctx.fillRect(-w/2, -h/2, w, h);
     ctx.lineWidth = Math.max(1, 3 * state.camera.scale);
-    ctx.strokeStyle = "#266b31";
+    ctx.strokeStyle = "#606260";
     ctx.strokeRect(-w/2, -h/2, w, h);
     ctx.restore();
 }

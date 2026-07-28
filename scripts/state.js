@@ -23,6 +23,7 @@ export const state = {
   wells: [],
   drops: [],
   damageTexts: [],
+  enemyBullets: [],
 
   // player placeholder (set by player module)
   player: null,
