@@ -23,4 +23,4 @@ update rocket icon
 hard mode, easy mode, medium mode
 endless mode, wave mode - PRIORITY
 press enter to restart
-mutatins (every 30 kills: pick a modifier like 30% rifle damage, but rifle bullets cost 2 focus etc.)
+tutorial
