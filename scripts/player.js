@@ -228,6 +228,42 @@ export function initInput(dom) {
             if (dom && dom.pauseButton) dom.pauseButton.classList.toggle("paused");
         }
         if (state.gameOver && e.key === "r") window.location.reload();
+        
+        if (e.key === "e" || e.key === "E") {
+            if (state.selectedTool === "rifle") {
+                state.selectedTool = "rocket";
+                dom.rifleButton.classList.remove('selected');
+                dom.rocketButton.classList.add('selected');
+            }
+            if (state.selectedTool === "rocket") {
+                state.selectedTool = "orb";
+                dom.rocketButton.classList.remove('selected');
+                dom.orbButton.classList.add('selected');
+            }
+            if (state.selectedTool === "orb") {
+                state.selectedTool = "well";
+                dom.orbButton.classList.remove('selected');
+                dom.wellButton.classList.add('selected');
+            }
+        }
+
+        if (e.key === "q" || e.key === "Q") {
+            if (state.selectedTool === "rocket") {
+                state.selectedTool = "rifle";
+                dom.rifleButton.classList.add('selected');
+                dom.rocketButton.classList.remove('selected');
+            }
+            if (state.selectedTool === "orb") {
+                state.selectedTool = "rocket";
+                dom.rocketButton.classList.add('selected');
+                dom.orbButton.classList.remove('selected');
+            }
+            if (state.selectedTool === "well") {
+                state.selectedTool = "orb";
+                dom.orbButton.classList.add('selected');
+                dom.wellButton.classList.remove('selected');
+            }
+        }
     });
 
     window.addEventListener("keyup", e => {
