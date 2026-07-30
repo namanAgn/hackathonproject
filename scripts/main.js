@@ -721,19 +721,11 @@ function drawGameOverScreen() {
     ctx.fillStyle = "#ed424265";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Every size below was picked against a desktop-sized canvas; on a phone
-    // canvas.width/height are only a few hundred px, so those same numbers
-    // (192px title font, etc.) overflowed the screen and looked huge. Scale
-    // everything against a 1280x720 reference instead, clamped so it never
-    // blows up past its original desktop size and never shrinks past
-    // legibility.
-    const uiScale = Math.max(0.4, Math.min(canvas.width / 1280, canvas.height / 720, 1));
-
-    ctx.font = `bold ${Math.round(192 * uiScale)}px Impact`;
+    ctx.font = `bold 192px Impact`;
     ctx.fillStyle = "#ff2b2b";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 3);
+    ctx.fillText("GAME OVER", canvas.width / 2, 0 + canvas.height / 3);
 
     const normalStats = [
         { label: "Enemies Killed", value: state.enemiesKilled },
@@ -754,25 +746,25 @@ function drawGameOverScreen() {
     ctx.textBaseline = "middle";
 
     const startY = canvas.height / 2;
-    const lineHeight = 26 * uiScale;
+    const lineHeight = 26;
     let currentY = startY;
 
-    ctx.font = `bold ${Math.round(22 * uiScale)}px Arial`;
+    ctx.font = `bold 22px Arial`;
     ctx.fillStyle = "#ffe14d";
     importantStats.forEach((stat) => {
         ctx.fillText(`${stat.label}: ${stat.value}`, canvas.width / 2, currentY);
         currentY += lineHeight;
     });
 
-    ctx.font = `${Math.round(20 * uiScale)}px Arial`;
+    ctx.font = `20px Arial`;
     ctx.fillStyle = "#ffffff";
     normalStats.forEach((stat) => {
         ctx.fillText(`${stat.label}: ${stat.value}`, canvas.width / 2, currentY);
         currentY += lineHeight;
     });
 
-    currentY += 15 * uiScale;
-    ctx.font = `bold ${Math.round(28 * uiScale)}px Arial`;
+    currentY += 15;
+    ctx.font = `bold 28px Arial`;
     ctx.fillStyle = "#00e5ff";
     ctx.fillText("Press R or Enter to restart", canvas.width / 2, currentY);
 }

@@ -37,13 +37,12 @@ const AIM_THROW_MIN = 60; // floor so a bare-deadzone pull doesn't aim at 0 dist
 // (near-zero radius) tiny thumb wobble swings atan2's angle wildly, which is
 // what read as "overly sensitive"; a wider deadzone keeps you out of that
 // unstable zone.
-const FIRE_DEADZONE = 0.4;
+const FIRE_DEADZONE = 0.35;
 const MOVE_DEADZONE = 0.15;
 // How fast the reported aim angle chases the raw stick angle, per update
 // (0-1, lower = smoother/laggier). Damps the same near-center jitter without
-// needing a bigger deadzone than feels good to use. Lowered again after
-// still reading as too sensitive at 0.35.
-const AIM_SMOOTHING = 0.22;
+// needing a bigger deadzone than feels good to use.
+const AIM_SMOOTHING = 0.35;
 
 function lerpAngle(from, to, t) {
     let diff = to - from;
@@ -68,7 +67,7 @@ function setupStick(baseEl, knobEl, onMove, onEnd) {
         const dist = Math.hypot(dx, dy);
         const clampedDist = Math.min(dist, radius);
         const angle = Math.atan2(dy, dx);
-        knobEl.style.transform = `translate(-50%, -50%) translate(${Math.cos(angle) * clampedDist}px, ${Math.sin(angle) * clampedDist}px)`;
+        knobEl.style.transform = `translate(${Math.cos(angle) * clampedDist}px, ${Math.sin(angle) * clampedDist}px)`;
         onMove(dist / radius, angle);
     }
 
@@ -84,7 +83,7 @@ function setupStick(baseEl, knobEl, onMove, onEnd) {
         if (!touch) return;
         touchId = null;
         baseEl.classList.remove('active');
-        knobEl.style.transform = 'translate(-50%, -50%)';
+        knobEl.style.transform = 'translate(0, 0)';
         onEnd();
     }
 

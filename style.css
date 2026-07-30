@@ -530,62 +530,13 @@ canvas {
     z-index: 1;
 }
 
-/* ---------- rotate-to-landscape prompt ----------
-   Only shown on touch devices (body.touch-device, set in touch-controls.js)
-   caught in portrait — a real screen-orientation *lock* isn't reliably
-   available cross-platform (iOS Safari doesn't support the Orientation
-   Lock API outside an installed home-screen app), so this is the actual
-   fix: block portrait play behind a full-screen prompt instead of letting
-   the game render sideways-squeezed. */
-.orientation-warning {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    background: #000;
-    color: var(--text);
-    font-family: var(--font-body);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 18px;
-    padding: 24px;
-    box-sizing: border-box;
-}
-
-.orientation-warning .rotate-icon {
-    font-size: 56px;
-    animation: rotate-hint 1.6s ease-in-out infinite;
-}
-
-.orientation-warning p {
-    font-size: 18px;
-    max-width: 280px;
-    margin: 0;
-}
-
-@keyframes rotate-hint {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(90deg); }
-}
-
-@media (orientation: portrait) {
-    body.touch-device .orientation-warning { display: flex; }
-}
-
-/* ---------- touch joysticks (hidden unless JS detects a touch device) ----------
-   Sized in vmin (the smaller of viewport width/height) rather than fixed px
-   or a width-only breakpoint, so the same rule holds up whether it's a
-   phone in landscape (short viewport height) or a tablet (much bigger in
-   both dimensions) — a width breakpoint alone misses the landscape-phone
-   case, where width is large but height is the tight dimension. */
+/* ---------- touch joysticks (hidden unless JS detects a touch device) ---------- */
 .joystick {
     display: none;
     position: fixed;
-    bottom: clamp(12px, 3vmin, 24px);
-    width: clamp(72px, 16vmin, 120px);
-    height: clamp(72px, 16vmin, 120px);
+    bottom: 24px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.08);
     border: 2px solid var(--panel-border);
@@ -597,21 +548,19 @@ canvas {
     background: rgba(255, 255, 255, 0.16);
 }
 
-.move-joystick { left: clamp(12px, 3vmin, 24px); }
-.aim-joystick { right: clamp(12px, 3vmin, 24px); }
+.move-joystick { left: 24px; }
+.aim-joystick { right: 24px; }
 
 .joystick-knob {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 44%;
-    height: 44%;
+    width: 52px;
+    height: 52px;
+    margin: -26px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.32);
     pointer-events: none;
-    /* touch-controls.js appends its own translate(x, y) drag offset after
-       this base centering transform on every move, so this stays first. */
-    transform: translate(-50%, -50%);
 }
 
 body.touch-device .joystick {
@@ -622,28 +571,27 @@ body.touch-device .joystick {
    off to the top-right, since both bottom corners are now spoken for and
    dead-center was sitting right on top of the action. Stacks the tools
    vertically so it reads as a sidebar rather than a wide bar across the
-   view. Everything below is vmin-based for the same landscape-phone reason
-   as the joysticks above. */
+   view. */
 body.touch-device .action-bar {
     bottom: auto;
-    top: clamp(50px, 12vmin, 90px);
+    top: 74px;
     left: auto;
-    right: clamp(8px, 2vmin, 16px);
+    right: 12px;
     flex-direction: column;
-    gap: clamp(6px, 1.4vmin, 10px);
+    gap: 8px;
 }
 
 body.touch-device .tool {
-    height: clamp(44px, 10vmin, 68px);
-    width: clamp(44px, 10vmin, 68px);
-    padding: clamp(4px, 1vmin, 8px);
+    height: 64px;
+    width: 64px;
+    padding: 6px;
     flex-direction: row;
     justify-content: center;
     gap: 6px;
 }
 
 body.touch-device .tool img {
-    width: clamp(22px, 5.5vmin, 34px);
+    width: 30px;
     margin: 0;
 }
 
@@ -654,72 +602,14 @@ body.touch-device .dash-indicator .name {
 }
 
 body.touch-device .dash-indicator {
-    width: clamp(44px, 10vmin, 68px);
-    height: clamp(44px, 10vmin, 68px);
-    padding: clamp(4px, 1vmin, 8px);
+    width: 64px;
+    height: 64px;
+    padding: 6px;
 }
 
-/* Top-left HUD (score/timer/health/focus/tasks) and the pause button — all
-   fixed-px in the desktop rules above, all rescaled here the same way. */
-body.touch-device .score {
-    font-size: clamp(15px, 4vmin, 32px);
-    top: clamp(8px, 2vmin, 15px);
-    left: clamp(8px, 2vmin, 15px);
-}
-
-body.touch-device .timer {
-    font-size: clamp(11px, 2.6vmin, 20px);
-    top: clamp(10px, 2.5vmin, 21px);
-    left: clamp(90px, 24vmin, 230px);
-}
-
-body.touch-device .wave-status {
-    font-size: clamp(14px, 3.6vmin, 32px);
-    top: clamp(8px, 2vmin, 20px);
-    right: clamp(56px, 13vmin, 90px);
-}
-
-body.touch-device .displays {
-    top: clamp(34px, 8vmin, 55px);
-    left: clamp(8px, 2vmin, 15px);
-    width: clamp(200px, 55vmin, 465px);
-    padding: clamp(6px, 1.6vmin, 12px);
-    gap: clamp(6px, 1.6vmin, 10px);
-}
-
-body.touch-device .health-display,
-body.touch-device .focus-display {
-    font-size: clamp(13px, 3.2vmin, 32px);
-    gap: clamp(4px, 1.2vmin, 10px);
-}
-
-body.touch-device .right {
-    font-size: clamp(11px, 2.6vmin, 24px);
-}
-
-body.touch-device .focus-bar,
-body.touch-device .health-bar {
-    height: clamp(13px, 3vmin, 32px);
-    width: clamp(90px, 26vmin, 200px);
-    border-radius: var(--radius-sm);
-}
-
-body.touch-device .tasks {
-    left: clamp(8px, 2vmin, 15px);
-    padding: clamp(8px, 2vmin, 15px);
-    font-size: clamp(10px, 2.2vmin, 16px);
-}
-
-body.touch-device .tasks h2 {
-    font-size: clamp(12px, 2.8vmin, 20px);
-}
-
-body.touch-device .pause {
-    right: clamp(6px, 1.6vmin, 15px);
-    top: clamp(6px, 1.6vmin, 15px);
-    padding: clamp(6px, 1.4vmin, 10px);
-}
-
-body.touch-device .pause img {
-    width: clamp(22px, 5vmin, 40px);
+@media (max-width: 480px) {
+    .joystick { width: 100px; height: 100px; }
+    .joystick-knob { width: 44px; height: 44px; margin: -22px; }
+    body.touch-device .tasks { transform: translateY(-50%) scale(0.85); transform-origin: left center; }
+    body.touch-device .displays { width: min(465px, calc(100vw - 30px)); }
 }

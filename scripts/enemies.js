@@ -55,7 +55,7 @@ export function spawnEnemyPredefined(x, y, type) {
         velocity: { x: 0, y: 0 },
         force: { x: 0, y: 0 },
         knockback: { x: 0, y: 0 },
-        speed: cfg.speed * (state.isTouchDevice ? C.TOUCH_ENEMY_SPEED_MULTIPLIER : 1),
+        speed: cfg.speed,
         health: cfg.health,
         maxHealth: cfg.health,
         w: cfg.w,
@@ -146,7 +146,7 @@ export function spawnEnemy() {
         velocity: { x: 0, y: 0 },
         force: { x: 0, y: 0 },
         knockback: { x: 0, y: 0 },
-        speed: cfg.speed * (state.isTouchDevice ? C.TOUCH_ENEMY_SPEED_MULTIPLIER : 1),
+        speed: cfg.speed,
         health: cfg.health,
         maxHealth: cfg.health,
         w: cfg.w,
@@ -370,7 +370,7 @@ export function spawnEnemies() {
         // so give a bit more breathing room between spawns on touch devices.
         // state.isTouchDevice is set once in touch-controls.js; tune/remove
         // this multiplier freely.
-        const spawnMultiplier = state.isTouchDevice ? C.TOUCH_SPAWN_INTERVAL_MULTIPLIER : 1;
+        const spawnMultiplier = state.isTouchDevice ? 1.35 : 1;
         state.nextEnemySpawnTime = state.time + C.ENEMY_SPAWN_COOLDOWN * spawnMultiplier;
     }
 }
