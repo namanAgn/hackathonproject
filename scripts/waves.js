@@ -17,6 +17,7 @@ export const WAVES = [
 ];
 
 import { state } from './state.js';
+import * as C from './constants.js';
 import { spawnEnemyOfType } from './enemies.js';
 
 function queueForWave(wave) {
@@ -57,7 +58,9 @@ export function updateWaves() {
     const currentWave = WAVES[waveState.number - 1];
     if (waveState.queue.length && state.time >= waveState.nextSpawnTime) {
         spawnEnemyOfType(waveState.queue.shift());
-        waveState.nextSpawnTime = state.time + currentWave.spawnInterval;
+        // See enemies.js spawnEnemies() for why touch gets extra spacing.
+        const spawnMultiplier = state.isTouchDevice ? C.TOUCH_SPAWN_INTERVAL_MULTIPLIER : 1;
+        waveState.nextSpawnTime = state.time + currentWave.spawnInterval * spawnMultiplier;
     }
 
     if (!waveState.waitingForNextWave && !waveState.queue.length && !state.enemies.length) {
