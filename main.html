@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+        <title>Project Singularity</title>
+        <link rel="stylesheet" href="style.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <main class="home-screen" id="home-screen">
+            <section class="mode-menu" aria-labelledby="game-title">
+                <h1 id="game-title"><span class="project-title">Project</span> <span class="singularity-title">Singularity</span></h1>
+
+                <div class="mode-options">
+                    <button class="mode-card endless-mode" type="button" data-mode="endless">
+                        Endless
+                    </button>
+
+                    <button class="mode-card wave-mode" type="button" data-mode="wave">
+                        Wave
+                    </button>
+
+                    <button class="mode-card quit">
+                        Quit
+                    </button>
+                </div>
+                <p class="mode-message" role="status" aria-live="polite"></p>
+            </section>
+        </main>
+
+        <div class="game-ui" id="game-ui" hidden>
+            <div class="pause">
+                <img src="./assets/ui/pause.svg">
+            </div>
+
+            <section class="pause-menu" id="pause-menu" hidden aria-labelledby="pause-title">
+                <div class="pause-panel">
+                    <h2 id="pause-title">Paused</h2>
+                    <div class="pause-content">
+                        <div class="pause-stats" aria-label="Run statistics">
+                            <div><span>Score</span><strong data-stat="score">0</strong></div>
+                            <div><span>Time survived</span><strong data-stat="time">00:00</strong></div>
+                            <div><span>Enemies killed</span><strong data-stat="enemiesKilled">0</strong></div>
+                            <div><span>Focus picked</span><strong data-stat="focusPicked">0</strong></div>
+                            <div><span>Damage dealt</span><strong data-stat="damageDealt">0</strong></div>
+                            <div><span>Damage received</span><strong data-stat="damageReceived">0</strong></div>
+                        </div>
+                        <div class="pause-actions">
+                            <button class="pause-action resume-button" type="button"> <img src="./assets/ui/pause.svg"> Resume</button>
+                            <button class="pause-action quit-button" type="button"> <img src="./assets/ui/quit.svg"> Quit</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="score">
+                Score: <span class="score-amount">0</span>
+            </div>
+            <div class="timer">Time: <span class="timer-amount">00:00</span></div>
+            <div class="wave-status" id="wave-status" hidden>Wave 1</div>
+
+            <div class="displays">
+            <div class="left">
+                <div class="health-display">Health:</div>
+                <div class="focus-display">Focus:</div>
+            </div>
+            <div class="middle">
+                <div class="health-bar"></div>
+                <div class="focus-bar"></div>
+            </div>
+            <div class="right">
+                <div class="health-amount">200/200</div>
+                <div class="focus-amount">200/200</div>
+            </div>
+            </div>
+
+            <div class="tasks">
+            <h2>Tasks</h2>
+            <div class="task">
+                <div class="task-name">Kills until Red Potion: </div>
+                <div class="task-goal red">0/25</div>
+            </div>
+            <div class="task">
+                <div class="task-name">Kills until Blue Potion: </div>
+                <div class="task-goal blue">0/45</div>
+            </div>
+            </div>
+
+            <div class="action-bar">
+            <div class="toolbar">
+            <div class="tool rifle">
+                <p class="cost">1 Focus</p>
+                <img src="./assets/ui/rifle.svg">
+                <p class="name"> [1] Kinetic Rifle</p>
+                <div class="cooldown-fill"></div>
+            </div>
+            <div class="tool rocket">
+                <p class="cost">8 Focus</p>
+                <img src="./assets/ui/land-mine.svg">
+                <p class="name"> [2] Singularity Cannon</p>
+                <div class="cooldown-fill"></div>
+            </div>
+            <div class="tool orb">
+                <p class="cost">35 Focus</p>
+                <img src="./assets/ui/orbital.svg">
+                <p class="name"> [3] Gravity Orb</p>
+                <div class="cooldown-fill"></div>
+            </div>
+            <div class="tool well">
+                <p class="cost">80 Focus</p>
+                <img src="./assets/ui/well.svg">
+                <p class="name"> [4] Gravity Well</p>
+                <div class="cooldown-fill"></div>
+            </div>
+            </div>
+
+            <div class="dash-indicator" title="Dash">
+                <svg class="dash-icon" viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12h8"/>
+                    <path d="M9 6l6 6-6 6"/>
+                    <path d="M14 6l6 6-6 6"/>
+                </svg>
+                <p class="name"> [RMB] Dash</p>
+                <div class="cooldown-fill"></div>
+            </div>
+            </div>
+
+            <div class="joystick move-joystick" id="move-joystick">
+                <div class="joystick-knob"></div>
+            </div>
+            <div class="joystick aim-joystick" id="aim-joystick">
+                <div class="joystick-knob"></div>
+            </div>
+        </div>
+
+        <canvas id="c"></canvas>
+        <script src="./scripts/main.js" type="module"></script>
+    </body>
+</html>

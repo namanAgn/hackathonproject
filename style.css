@@ -1,0 +1,599 @@
+:root {
+    --bg: #1a1a1c;
+
+    --panel-bg: rgba(32, 32, 36, 0.65);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --panel-blur: 10px;
+    --radius-lg: 14px;
+    --radius-sm: 8px;
+
+    --accent: #fde61c;
+    --accent-green: #4aae56;
+    --accent-green-dim: rgba(28, 253, 32, 0.234);
+    --accent-dim: rgba(215, 253, 28, 0.15);
+    --accent-glow: rgba(215, 253, 28, 0.35);
+
+    --health: #e35c5c;
+    --focus: #8a6bd8;
+    --blue: #00D9FF;
+
+    --text: #e8e8ea;
+    --text-dim: #a8a8ac;
+
+    --font-heading: "Montserrat", sans-serif;
+    --font-body: "Poppins", sans-serif;
+
+    --transition: all 0.25s ease;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000;
+    zoom: 100%;
+    touch-action: none;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+canvas {
+    display: block;
+    cursor: default;
+    touch-action: none;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.home-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: 32px;
+    box-sizing: border-box;
+    background: #000;
+    color: var(--text);
+    font-family: var(--font-body);
+}
+
+.mode-menu {
+    width: min(720px, 100%);
+    box-sizing: border-box;
+    padding: clamp(32px, 6vw, 64px);
+    border: 4px solid var(--panel-border);
+    border-radius: 32px;
+    background: #1a1a1c;
+    text-align: center;
+}
+
+.mode-menu h1 {
+    margin: 0 0 42px;
+    font: 800 clamp(52px, 9vw, 100px)/0.95 var(--font-heading);
+    letter-spacing: -0.07em;
+    text-transform: uppercase;
+}
+
+.project-title { color: var(--accent); }
+.singularity-title { color: var(--blue); }
+
+.mode-options {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.mode-card {
+    width: 300px;
+    height: 60px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: #3d82c6;
+    color: #fff;
+    font: 800 24px var(--font-heading);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.mode-card.quit {
+    width: 200px;
+    background-color: #e35c5c;
+}
+
+.mode-card.quit:hover {
+    background-color: #ff8585;
+}
+
+.mode-card:hover,
+.mode-card:focus-visible {
+    transform: translateY(-3px);
+    background: #5a9cdd;
+    outline: none;
+}
+
+.endless-mode { background: #3d82c6; }
+.endless-mode:hover,
+.endless-mode:focus-visible { background: #6ac775; }
+
+.wave-mode:hover,
+.wave-mode:focus-visible { background: #6ac775; }
+
+.mode-message { min-height: 1.5em; margin: 20px 0 0; color: var(--focus); }
+
+@media (max-width: 640px) {
+    .home-screen { padding: 20px; }
+    .mode-menu { padding: 32px 20px; }
+    .mode-menu h1 { margin-bottom: 30px; }
+    .mode-card { width: min(300px, 100%); height: 60px; font-size: 16px; }
+}
+
+.pause-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.55);
+    font-family: var(--font-body);
+}
+
+.pause-panel {
+    width: 300px;
+    padding: 20px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(var(--panel-blur));
+    border-radius: var(--radius-lg);
+}
+
+.pause-panel h2,
+.pause-stats h3 { margin: 0; font-family: var(--font-heading); }
+.pause-panel h2 { color: var(--accent); font-size: 40px; }
+.pause-panel { text-align: center; }
+.pause-content { display: flex; flex-direction: column; align-items: center; gap: 30px; margin-top: 24px; }
+.pause-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pause-action {
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    display: flex;
+    width: 180px;
+    min-height: 48px;
+    border: 1px solid var(--accent-green);
+    border-radius: var(--radius-sm);
+    background: var(--accent-green-dim);
+    color: var(--text);
+    cursor: pointer;
+    font: 700 18px var(--font-heading);
+    text-transform: uppercase;
+}
+.pause-action img {
+    width: 20px;
+}
+.pause-action:hover, .pause-action:focus-visible { background: var(--accent-green); color: #111; outline: none; }
+.quit-button { border-color: #c74343; background: rgba(199, 67, 67, 0.2); }
+.quit-button:hover, .quit-button:focus-visible { background: #c74343; }
+.pause-stats h3 { color: var(--focus); font-size: 18px; margin-bottom: 14px; }
+.pause-stats { width: 100%; }
+.pause-stats div { display: flex; justify-content: space-between; gap: 18px; padding: 5px 0; color: var(--text-dim); }
+.pause-stats strong { color: var(--text); }
+
+@media (max-width: 560px) {
+    .pause-panel { padding: 22px; }
+    .pause-content { grid-template-columns: 1fr; gap: 24px; }
+    .pause-stats { border-left: 0; border-top: 1px solid var(--panel-border); padding: 20px 0 0; }
+}
+
+/* ---------- shared panel look ---------- */
+.tasks,
+.displays,
+.toolbar,
+.pause,
+.dash-indicator {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(var(--panel-blur));
+    border-radius: var(--radius-lg);
+}
+
+.tasks h2 {
+    color: var(--accent);
+    margin: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.tasks {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    padding: 15px;
+    color: white;
+    font-family: "Montserrat";
+}
+
+.displays {
+    display: flex;
+    position: absolute;
+    top: 55px;
+    left: 15px;
+    gap: 10px;
+    width: 465px;
+    padding: 12px;
+}
+
+.score {
+    color: var(--accent);
+    font-size: 32px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+.timer {
+    position: absolute;
+    top: 21px;
+    left: 230px;
+    color: var(--text);
+    font: 700 20px var(--font-heading);
+}
+
+.timer-amount { color: var(--accent); }
+
+.wave-status {
+    position: absolute;
+    top: 20px;
+    right: 90px;
+    color: var(--accent);
+    font: 700 32px var(--font-heading);
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+}
+
+.tool {
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: var(--font-body);
+    height: 120px;
+    width: 80px;
+    padding: 10px;
+    text-align: center;
+    outline: 3px solid transparent;
+    transition: var(--transition);
+}
+
+.tool .cost {
+    color: var(--accent-green);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.tool .name {
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 6px 0 0;
+}
+
+.tool:hover {
+    background-color: var(--panel-border);
+    outline: 3px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+
+.tool.selected,
+.tool.selected:hover {
+    background: var(--accent-green-dim);
+    outline: 3px solid var(--accent-green);
+}
+
+.tool img {
+    width: 50px;
+}
+
+.tool {
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    height: 120px;
+    width: 80px;
+    padding: 10px;
+
+    font-family: var(--font-body);
+    text-align: center;
+    outline: 3px solid transparent;
+    transition: var(--transition);
+}
+
+.tool .name {
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+
+    margin: 0;
+}
+
+.tool img {
+    width: 50px;
+    margin: auto 0;
+}
+
+.tool .cost {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+
+    margin: 0;
+}
+
+.left,
+.middle {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.right {
+    font-size: 24px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    color: var(--text);
+}
+
+.focus-display,
+.health-display {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 32px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+.health-display,
+.health-amount {
+    color: var(--health);
+}
+
+.focus-display,
+.focus-amount {
+    color: var(--focus);
+}
+
+.focus-amount {
+    padding-top: 12px;
+}
+
+.focus-bar,
+.health-bar {
+    height: 32px;
+    width: 200px;
+    border-radius: var(--radius-sm);
+}
+
+.health-bar {
+    background-color: var(--health);
+}
+
+.focus-bar {
+    background-color: var(--focus);
+}
+
+.pause {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    padding: 10px;
+    transition: var(--transition);
+}
+
+.pause.paused {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+}
+
+.pause img {
+    width: 40px;
+}
+
+.pause:hover {
+    scale: 1.1;
+    cursor: pointer;
+}
+
+.cover-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 99;
+}
+
+.play-button {
+    position: absolute;
+    bottom: 25%;
+    right: 15%;
+    height: 80px;
+    width: 300px;
+    z-index: 100;
+    font-size: 32px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    color: var(--accent);
+    background-color: transparent;
+    border: 4px solid var(--accent);
+    transition: var(--transition);
+}
+
+.play-button:hover {
+    background: var(--accent-dim);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ---------- action bar: toolbar + the separate, floating dash indicator ---------- */
+.action-bar {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+}
+
+.tool,
+.dash-indicator {
+    position: relative;
+    overflow: hidden;
+}
+
+.dash-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 90px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.dash-indicator .name {
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+}
+
+.dash-icon {
+    color: var(--blue);
+    margin: auto 0;
+}
+
+/* Cooldown display: a light-highlight overlay that fills the whole card
+   from the bottom up when a tool is used, then drains back to nothing as
+   the cooldown finishes — sits behind the icon/text, above the panel bg. */
+.cooldown-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0%;
+    background: rgba(255, 255, 255, 0.22);
+    /* Fills instantly on use, then eases back down to 0 as the cooldown
+       drains — matches the ~60fps step of the game loop closely enough
+       to read as smooth without stacking up transition queues. */
+    transition: height 0.05s linear;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tool > *:not(.cooldown-fill),
+.dash-indicator > *:not(.cooldown-fill) {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- touch joysticks (hidden unless JS detects a touch device) ---------- */
+.joystick {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid var(--panel-border);
+    z-index: 20;
+    touch-action: none;
+}
+
+.joystick.active {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.move-joystick { left: 24px; }
+.aim-joystick { right: 24px; }
+
+.joystick-knob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 52px;
+    height: 52px;
+    margin: -26px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.32);
+    pointer-events: none;
+}
+
+body.touch-device .joystick {
+    display: block;
+}
+
+/* Move the weapon toolbar + dash button out from behind the joysticks and
+   up to the top, since both bottom corners are now spoken for. Health/
+   focus/score/tasks panels are left alone — they're already top-anchored. */
+body.touch-device .action-bar {
+    bottom: auto;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+body.touch-device .tool {
+    height: 90px;
+    width: 62px;
+}
+
+body.touch-device .tool img {
+    width: 36px;
+}
+
+body.touch-device .tool .name,
+body.touch-device .dash-indicator .name {
+    font-size: 11px;
+}
+
+@media (max-width: 480px) {
+    .joystick { width: 100px; height: 100px; }
+    .joystick-knob { width: 44px; height: 44px; margin: -22px; }
+    body.touch-device .tasks { transform: translateY(-50%) scale(0.85); transform-origin: left center; }
+    body.touch-device .displays { width: min(465px, calc(100vw - 30px)); }
+}
