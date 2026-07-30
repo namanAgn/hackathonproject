@@ -1,31 +1,31 @@
-prevent enemy spawn past a certain amount of enemies (thinking 35)  ------------ DONE
-add an explosive barrel (reuse rpg) -------------------------------------------- DONE
-excess focus gets turned into a highscore -------------------------------------- DONE
-enemies drop a health regen thing ---------------------------------------------- DONE
-unify ui color scheme ---------------------------------------------------------- DONE
-sniper enemy type (shooter but slower and farther) ----------------------------- DONE   
-exploding enemy type ----------------------------------------------------------- DONE
-make drops get removed after a while ------------------------------------------- DONE
-cooldown for well spawning ----------------------------------------------------- DONE
-enemies spawn farther and never on screen -------------------------------------- DONE
-stats on game over screen ------------------------------------------------------ DONE
-improve game over screen ------------------------------------------------------- DONE
-change explosive to kamikize --------------------------------------------------- DONE
+prevent enemy spawn past a certain amount of enemies (thinking 35)  ------------------------------------ DONE
+add an explosive barrel (reuse rpg) -------------------------------------------------------------------- DONE
+excess focus gets turned into a highscore -------------------------------------------------------------- DONE
+enemies drop a health regen thing ---------------------------------------------------------------------- DONE
+unify ui color scheme ---------------------------------------------------------------------------------- DONE
+sniper enemy type (shooter but slower and farther) ----------------------------------------------------- DONE   
+exploding enemy type ----------------------------------------------------------------------------------- DONE
+make drops get removed after a while ------------------------------------------------------------------- DONE
+cooldown for well spawning ----------------------------------------------------------------------------- DONE
+enemies spawn farther and never on screen -------------------------------------------------------------- DONE
+stats on game over screen ------------------------------------------------------------------------------ DONE
+improve game over screen ------------------------------------------------------------------------------- DONE
+change explosive to kamikize --------------------------------------------------------------------------- DONE
 red potion: 50% mre damage and 50% faster speed  for 12 seconds (red outline around screen) ------------ DONE
 blue potion: infinite focus for 5 seconds (blue outline around screen) --------------------------------- DONE
-e and q to cycle between weapons ----------------------------------------------- DONE
-pop up to show which weapon was selected --------------------------------------- DONE
-update rocket icon - at home --------------------------------------------------- DONE
+e and q to cycle between weapons ----------------------------------------------------------------------- DONE
+pop up to show which weapon was selected --------------------------------------------------------------- DONE
+update rocket icon - at home --------------------------------------------------------------------------- DONE
 hard mode, easy mode, medium mode 
-wave mode ---------------------------------------------------------------------- DONE
-press enter to restart --------------------------------------------------------- DONE
-tutorial
-integrate map V2 into existing Wave System Game -------------------------------- DONE
-city map ----------------------------------------------------------------------- DONE
-change name of rocket launcher to singularity cannon --------------------------- DONE
-right click to dash ------------------------------------------------------------ DONE
-change position of the time display -------------------------------------------- DONE
-update cost of weapons in ui --------------------------------------------------- DONE
-improve heavy collision detction ----------------------------------------------- DONE
-fix blue potion buff application ----------------------------------------------- DONE
+wave mode ---------------------------------------------------------------------------------------------- DONE
+press enter to restart --------------------------------------------------------------------------------- DONE
+integrate map V2 into existing Wave System Game -------------------------------------------------------- DONE
+city map ----------------------------------------------------------------------------------------------- DONE
+change name of rocket launcher to singularity cannon --------------------------------------------------- DONE
+right click to dash ------------------------------------------------------------------------------------ DONE
+change position of the time display -------------------------------------------------------------------- DONE
+update cost of weapons in ui --------------------------------------------------------------------------- DONE
+improve heavy collision detction ----------------------------------------------------------------------- DONE
+fix blue potion buff application ----------------------------------------------------------------------- DONE
 add more waves
+add mobile support ------------------------------------------------------------------------------------- DONE
