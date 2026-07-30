@@ -470,146 +470,126 @@ body.touch-device .joystick {
 
 /* Small Screens / Mobile Adjustments */
 @media (max-width: 768px) {
-    .displays {
-        top: 50px;
-        padding: 8px;
-        gap: 8px;
-    }
+  /* 1. Scale down the main HUD panel proportionally using viewport units */
+  .displays {
+    top: 40px !important;
+    left: 10px !important;
+    width: auto !important;
+    max-width: calc(100vw - 80px) !important; /* Leave room for pause button */
+    padding: 6px 10px !important;
+    gap: 6px !important;
+  }
 
-    .focus-display,
-    .health-display {
-        font-size: 20px;
-    }
+  /* Shrink text inside HUD */
+  .focus-display,
+  .health-display {
+    font-size: 14px !important;
+  }
 
-    .focus-bar,
-    .health-bar {
-        width: 110px;
-        height: 22px;
-    }
+  /* Shrink health and focus bars dramatically */
+  .focus-bar,
+  .health-bar {
+    width: clamp(60px, 20vw, 120px) !important;
+    height: 14px !important;
+  }
 
-    .right {
-        font-size: 16px;
-    }
+  .right {
+    font-size: 12px !important;
+  }
 
-    .focus-amount {
-        padding-top: 4px;
-    }
+  .focus-amount {
+    padding-top: 2px !important;
+  }
 
-    .score {
-        font-size: 22px;
-    }
+  /* Top Stats Bar */
+  .score {
+    font-size: 16px !important;
+    top: 10px !important;
+    left: 10px !important;
+  }
 
-    .timer {
-        font-size: 16px;
-        top: 20px;
-        left: 150px;
-    }
+  .timer {
+    font-size: 13px !important;
+    top: 12px !important;
+    left: 110px !important;
+  }
 
-    .wave-status {
-        font-size: 22px;
-        right: 70px;
-    }
+  .wave-status {
+    font-size: 16px !important;
+    top: 10px !important;
+    right: 60px !important;
+  }
 
-    .tasks {
-        font-size: 13px;
-        padding: 10px;
-        max-width: 180px;
-    }
+  /* Pause Icon */
+  .pause {
+    top: 8px !important;
+    right: 8px !important;
+    padding: 6px !important;
+  }
 
-    .tasks h2 {
-        font-size: 16px;
-    }
+  .pause img {
+    width: 24px !important;
+  }
 
-    .home-screen { padding: 20px; }
-    .mode-menu { padding: 32px 20px; }
-    .mode-menu h1 { margin-bottom: 30px; }
-    .mode-card { width: min(300px, 100%); height: 60px; font-size: 18px; }
+  /* Tasks Menu */
+  .tasks {
+    font-size: 11px !important;
+    padding: 8px !important;
+    max-width: 140px !important;
+    left: 10px !important;
+    top: 42% !important;
+  }
+
+  .tasks h2 {
+    font-size: 13px !important;
+  }
 }
 
-/* Touch-Specific UI Adjustments */
-body.touch-device .displays {
-    top: 45px;
-    width: calc(100vw - 80px);
-}
-
-body.touch-device .score {
-    font-size: 18px;
-    top: 12px;
-}
-
-body.touch-device .timer {
-    font-size: 14px;
-    top: 14px;
-    left: 120px;
-}
-
-body.touch-device .wave-status {
-    font-size: 18px;
-    top: 12px;
-    right: 60px;
-}
-
+/* 2. Touch Device Specific Toolbar & Joysticks */
 body.touch-device .action-bar {
-    bottom: auto;
-    top: 60px;
-    left: auto;
-    right: 12px;
-    flex-direction: column;
-    gap: 6px;
+  top: 50px !important;
+  right: 8px !important;
+  bottom: auto !important;
+  left: auto !important;
+  flex-direction: column !important;
+  gap: 4px !important;
 }
 
 body.touch-device .toolbar {
-    padding: 6px;
-    gap: 6px;
-    flex-direction: column;
+  padding: 4px !important;
+  gap: 4px !important;
+  flex-direction: column !important;
 }
 
 body.touch-device .tool,
 body.touch-device .dash-indicator {
-    width: 48px;
-    height: 48px;
-    padding: 4px;
-    flex-direction: row;
-    justify-content: center;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 2px !important;
+  border-radius: 6px !important;
 }
 
 body.touch-device .tool img {
-    width: 24px;
-    margin: 0;
+  width: 20px !important;
 }
 
 body.touch-device .dash-icon {
-    width: 28px;
-    height: 28px;
+  width: 22px !important;
+  height: 22px !important;
 }
 
-body.touch-device .tool .cost,
-body.touch-device .tool .name,
-body.touch-device .dash-indicator .name {
-    display: none;
+/* Compact Joysticks so they don't cover half the screen */
+body.touch-device .joystick {
+  width: 80px !important;
+  height: 80px !important;
+  bottom: 12px !important;
 }
 
-body.touch-device .tasks {
-    top: 38%;
-    left: 10px;
-    font-size: 11px;
-    padding: 8px;
-    transform: translateY(-50%);
-}
+body.touch-device .move-joystick { left: 12px !important; }
+body.touch-device .aim-joystick { right: 12px !important; }
 
-@media (max-width: 600px) {
-    .joystick {
-        width: 90px;
-        height: 90px;
-        bottom: 16px;
-    }
-
-    .move-joystick { left: 16px; }
-    .aim-joystick { right: 16px; }
-
-    .joystick-knob {
-        width: 40px;
-        height: 40px;
-        margin: -20px;
-    }
+body.touch-device .joystick-knob {
+  width: 34px !important;
+  height: 34px !important;
+  margin: -17px !important;
 }
