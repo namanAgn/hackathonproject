@@ -1,0 +1,12 @@
+game soundtrack
+main menu soundtrack
+rifle firing 
+rocket shooting
+rocket cooldown clicking
+gravity well explosion
+gravity orb explosion
+button press
+enemies hit
+enemies dead
+player walking on grass
+player walking on road

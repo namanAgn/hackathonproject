@@ -49,6 +49,7 @@ canvas {
     display: none !important;
 }
 
+/* ---------- HOME SCREEN ---------- */
 .home-screen {
     position: fixed;
     inset: 0;
@@ -77,7 +78,7 @@ canvas {
 
 .mode-menu h1 {
     margin: 0 0 42px;
-    font: 800 clamp(52px, 9vw, 100px)/0.95 var(--font-heading);
+    font: 800 clamp(40px, 8vw, 100px)/0.95 var(--font-heading);
     letter-spacing: -0.07em;
     text-transform: uppercase;
 }
@@ -132,13 +133,7 @@ canvas {
 
 .mode-message { min-height: 1.5em; margin: 20px 0 0; color: var(--focus); }
 
-@media (max-width: 640px) {
-    .home-screen { padding: 20px; }
-    .mode-menu { padding: 32px 20px; }
-    .mode-menu h1 { margin-bottom: 30px; }
-    .mode-card { width: min(300px, 100%); height: 60px; font-size: 16px; }
-}
-
+/* ---------- PAUSE MENU ---------- */
 .pause-menu {
     position: fixed;
     inset: 0;
@@ -152,24 +147,25 @@ canvas {
 }
 
 .pause-panel {
-    width: 300px;
+    width: min(300px, 90vw);
     padding: 20px;
     background: var(--panel-bg);
     border: 1px solid var(--panel-border);
     backdrop-filter: blur(var(--panel-blur));
     border-radius: var(--radius-lg);
+    text-align: center;
 }
 
 .pause-panel h2,
 .pause-stats h3 { margin: 0; font-family: var(--font-heading); }
-.pause-panel h2 { color: var(--accent); font-size: 40px; }
-.pause-panel { text-align: center; }
-.pause-content { display: flex; flex-direction: column; align-items: center; gap: 30px; margin-top: 24px; }
+.pause-panel h2 { color: var(--accent); font-size: 36px; }
+.pause-content { display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 20px; }
 .pause-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
 .pause-action {
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 16px;
     display: flex;
     width: 180px;
     min-height: 48px;
@@ -181,24 +177,17 @@ canvas {
     font: 700 18px var(--font-heading);
     text-transform: uppercase;
 }
-.pause-action img {
-    width: 20px;
-}
+.pause-action img { width: 20px; }
 .pause-action:hover, .pause-action:focus-visible { background: var(--accent-green); color: #111; outline: none; }
+
 .quit-button { border-color: #c74343; background: rgba(199, 67, 67, 0.2); }
 .quit-button:hover, .quit-button:focus-visible { background: #c74343; }
-.pause-stats h3 { color: var(--focus); font-size: 18px; margin-bottom: 14px; }
+
 .pause-stats { width: 100%; }
-.pause-stats div { display: flex; justify-content: space-between; gap: 18px; padding: 5px 0; color: var(--text-dim); }
+.pause-stats div { display: flex; justify-content: space-between; gap: 18px; padding: 5px 0; color: var(--text-dim); font-size: 14px; }
 .pause-stats strong { color: var(--text); }
 
-@media (max-width: 560px) {
-    .pause-panel { padding: 22px; }
-    .pause-content { grid-template-columns: 1fr; gap: 24px; }
-    .pause-stats { border-left: 0; border-top: 1px solid var(--panel-border); padding: 20px 0 0; }
-}
-
-/* ---------- shared panel look ---------- */
+/* ---------- GAME UI PANELS ---------- */
 .tasks,
 .displays,
 .toolbar,
@@ -208,13 +197,7 @@ canvas {
     border: 1px solid var(--panel-border);
     backdrop-filter: blur(var(--panel-blur));
     border-radius: var(--radius-lg);
-}
-
-.tasks h2 {
-    color: var(--accent);
-    margin: 0;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    box-sizing: border-box;
 }
 
 .tasks {
@@ -224,7 +207,14 @@ canvas {
     transform: translateY(-50%);
     padding: 15px;
     color: white;
-    font-family: "Montserrat";
+    font-family: var(--font-heading);
+}
+
+.tasks h2 {
+    color: var(--accent);
+    margin: 0;
+    padding-bottom: 5px;
+    font-size: 20px;
 }
 
 .displays {
@@ -233,9 +223,46 @@ canvas {
     top: 55px;
     left: 15px;
     gap: 10px;
-    width: 465px;
+    width: min(465px, calc(100vw - 30px));
     padding: 12px;
 }
+
+.left, .middle {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.right {
+    font-size: 24px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    color: var(--text);
+}
+
+.focus-display,
+.health-display {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 32px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+.health-display, .health-amount { color: var(--health); }
+.focus-display, .focus-amount { color: var(--focus); }
+.focus-amount { padding-top: 12px; }
+
+.focus-bar,
+.health-bar {
+    height: 32px;
+    width: 200px;
+    border-radius: var(--radius-sm);
+}
+
+.health-bar { background-color: var(--health); }
+.focus-bar { background-color: var(--focus); }
 
 .score {
     color: var(--accent);
@@ -266,6 +293,39 @@ canvas {
     font: 700 32px var(--font-heading);
 }
 
+.pause {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    padding: 10px;
+    transition: var(--transition);
+}
+
+.pause.paused {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+}
+
+.pause img {
+    width: 40px;
+    display: block;
+}
+
+.pause:hover {
+    scale: 1.1;
+    cursor: pointer;
+}
+
+/* ---------- ACTION BAR ---------- */
+.action-bar {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+}
+
 .toolbar {
     display: flex;
     gap: 10px;
@@ -292,7 +352,12 @@ canvas {
     color: var(--accent-green);
     font-size: 13px;
     font-weight: 600;
-    margin: 0 0 4px;
+    margin: 0;
+}
+
+.tool img {
+    width: 50px;
+    margin: auto 0;
 }
 
 .tool .name {
@@ -300,7 +365,7 @@ canvas {
     font-family: var(--font-heading);
     font-size: 13px;
     font-weight: 600;
-    margin: 6px 0 0;
+    margin: 0;
 }
 
 .tool:hover {
@@ -313,172 +378,6 @@ canvas {
 .tool.selected:hover {
     background: var(--accent-green-dim);
     outline: 3px solid var(--accent-green);
-}
-
-.tool img {
-    width: 50px;
-}
-
-.tool {
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    height: 120px;
-    width: 80px;
-    padding: 10px;
-
-    font-family: var(--font-body);
-    text-align: center;
-    outline: 3px solid transparent;
-    transition: var(--transition);
-}
-
-.tool .name {
-    color: var(--accent);
-    font-family: var(--font-heading);
-    font-size: 13px;
-    font-weight: 600;
-
-    margin: 0;
-}
-
-.tool img {
-    width: 50px;
-    margin: auto 0;
-}
-
-.tool .cost {
-    color: white;
-    font-size: 15px;
-    font-weight: 600;
-
-    margin: 0;
-}
-
-.left,
-.middle {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.right {
-    font-size: 24px;
-    font-weight: 600;
-    font-family: var(--font-body);
-    color: var(--text);
-}
-
-.focus-display,
-.health-display {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    font-size: 32px;
-    font-family: var(--font-heading);
-    font-weight: 700;
-}
-
-.health-display,
-.health-amount {
-    color: var(--health);
-}
-
-.focus-display,
-.focus-amount {
-    color: var(--focus);
-}
-
-.focus-amount {
-    padding-top: 12px;
-}
-
-.focus-bar,
-.health-bar {
-    height: 32px;
-    width: 200px;
-    border-radius: var(--radius-sm);
-}
-
-.health-bar {
-    background-color: var(--health);
-}
-
-.focus-bar {
-    background-color: var(--focus);
-}
-
-.pause {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    padding: 10px;
-    transition: var(--transition);
-}
-
-.pause.paused {
-    background: var(--accent-dim);
-    border-color: var(--accent);
-}
-
-.pause img {
-    width: 40px;
-}
-
-.pause:hover {
-    scale: 1.1;
-    cursor: pointer;
-}
-
-.cover-page {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    z-index: 99;
-}
-
-.play-button {
-    position: absolute;
-    bottom: 25%;
-    right: 15%;
-    height: 80px;
-    width: 300px;
-    z-index: 100;
-    font-size: 32px;
-    font-family: var(--font-heading);
-    font-weight: 700;
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    color: var(--accent);
-    background-color: transparent;
-    border: 4px solid var(--accent);
-    transition: var(--transition);
-}
-
-.play-button:hover {
-    background: var(--accent-dim);
-    box-shadow: 0 0 20px var(--accent-glow);
-}
-
-/* ---------- action bar: toolbar + the separate, floating dash indicator ---------- */
-.action-bar {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-    display: flex;
-    align-items: stretch;
-    gap: 14px;
-}
-
-.tool,
-.dash-indicator {
-    position: relative;
-    overflow: hidden;
 }
 
 .dash-indicator {
@@ -506,9 +405,12 @@ canvas {
     margin: auto 0;
 }
 
-/* Cooldown display: a light-highlight overlay that fills the whole card
-   from the bottom up when a tool is used, then drains back to nothing as
-   the cooldown finishes — sits behind the icon/text, above the panel bg. */
+.tool,
+.dash-indicator {
+    position: relative;
+    overflow: hidden;
+}
+
 .cooldown-fill {
     position: absolute;
     left: 0;
@@ -516,9 +418,6 @@ canvas {
     bottom: 0;
     height: 0%;
     background: rgba(255, 255, 255, 0.22);
-    /* Fills instantly on use, then eases back down to 0 as the cooldown
-       drains — matches the ~60fps step of the game loop closely enough
-       to read as smooth without stacking up transition queues. */
     transition: height 0.05s linear;
     pointer-events: none;
     z-index: 0;
@@ -530,7 +429,7 @@ canvas {
     z-index: 1;
 }
 
-/* ---------- touch joysticks (hidden unless JS detects a touch device) ---------- */
+/* ---------- TOUCH JOYSTICKS ---------- */
 .joystick {
     display: none;
     position: fixed;
@@ -567,32 +466,121 @@ body.touch-device .joystick {
     display: block;
 }
 
-/* Move the weapon toolbar + dash button out from behind the joysticks and
-   off to the top-right, since both bottom corners are now spoken for and
-   dead-center was sitting right on top of the action. Stacks the tools
-   vertically so it reads as a sidebar rather than a wide bar across the
-   view. */
+/* ---------- RESPONSIVE MEDIA QUERIES ---------- */
+
+/* Small Screens / Mobile Adjustments */
+@media (max-width: 768px) {
+    .displays {
+        top: 50px;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .focus-display,
+    .health-display {
+        font-size: 20px;
+    }
+
+    .focus-bar,
+    .health-bar {
+        width: 110px;
+        height: 22px;
+    }
+
+    .right {
+        font-size: 16px;
+    }
+
+    .focus-amount {
+        padding-top: 4px;
+    }
+
+    .score {
+        font-size: 22px;
+    }
+
+    .timer {
+        font-size: 16px;
+        top: 20px;
+        left: 150px;
+    }
+
+    .wave-status {
+        font-size: 22px;
+        right: 70px;
+    }
+
+    .tasks {
+        font-size: 13px;
+        padding: 10px;
+        max-width: 180px;
+    }
+
+    .tasks h2 {
+        font-size: 16px;
+    }
+
+    .home-screen { padding: 20px; }
+    .mode-menu { padding: 32px 20px; }
+    .mode-menu h1 { margin-bottom: 30px; }
+    .mode-card { width: min(300px, 100%); height: 60px; font-size: 18px; }
+}
+
+/* Touch-Specific UI Adjustments */
+body.touch-device .displays {
+    top: 45px;
+    width: calc(100vw - 80px);
+}
+
+body.touch-device .score {
+    font-size: 18px;
+    top: 12px;
+}
+
+body.touch-device .timer {
+    font-size: 14px;
+    top: 14px;
+    left: 120px;
+}
+
+body.touch-device .wave-status {
+    font-size: 18px;
+    top: 12px;
+    right: 60px;
+}
+
 body.touch-device .action-bar {
     bottom: auto;
-    top: 74px;
+    top: 60px;
     left: auto;
     right: 12px;
     flex-direction: column;
-    gap: 8px;
-}
-
-body.touch-device .tool {
-    height: 64px;
-    width: 64px;
-    padding: 6px;
-    flex-direction: row;
-    justify-content: center;
     gap: 6px;
 }
 
+body.touch-device .toolbar {
+    padding: 6px;
+    gap: 6px;
+    flex-direction: column;
+}
+
+body.touch-device .tool,
+body.touch-device .dash-indicator {
+    width: 48px;
+    height: 48px;
+    padding: 4px;
+    flex-direction: row;
+    justify-content: center;
+}
+
 body.touch-device .tool img {
-    width: 30px;
+    width: 24px;
     margin: 0;
+}
+
+body.touch-device .dash-icon {
+    width: 28px;
+    height: 28px;
 }
 
 body.touch-device .tool .cost,
@@ -601,15 +589,27 @@ body.touch-device .dash-indicator .name {
     display: none;
 }
 
-body.touch-device .dash-indicator {
-    width: 64px;
-    height: 64px;
-    padding: 6px;
+body.touch-device .tasks {
+    top: 38%;
+    left: 10px;
+    font-size: 11px;
+    padding: 8px;
+    transform: translateY(-50%);
 }
 
-@media (max-width: 480px) {
-    .joystick { width: 100px; height: 100px; }
-    .joystick-knob { width: 44px; height: 44px; margin: -22px; }
-    body.touch-device .tasks { transform: translateY(-50%) scale(0.85); transform-origin: left center; }
-    body.touch-device .displays { width: min(465px, calc(100vw - 30px)); }
+@media (max-width: 600px) {
+    .joystick {
+        width: 90px;
+        height: 90px;
+        bottom: 16px;
+    }
+
+    .move-joystick { left: 16px; }
+    .aim-joystick { right: 16px; }
+
+    .joystick-knob {
+        width: 40px;
+        height: 40px;
+        margin: -20px;
+    }
 }
