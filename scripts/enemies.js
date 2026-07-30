@@ -366,7 +366,12 @@ export function updateEnemyBullets() {
 export function spawnEnemies() {
     if (state.enemies.length <= C.MAX_ENEMIES && state.time >= state.nextEnemySpawnTime && state.enableSpawnEnemies) {
         spawnEnemy();
-        state.nextEnemySpawnTime = state.time + C.ENEMY_SPAWN_COOLDOWN;
+        // Twin-stick touch aim is slower to fight with than mouse+keyboard,
+        // so give a bit more breathing room between spawns on touch devices.
+        // state.isTouchDevice is set once in touch-controls.js; tune/remove
+        // this multiplier freely.
+        const spawnMultiplier = state.isTouchDevice ? 1.35 : 1;
+        state.nextEnemySpawnTime = state.time + C.ENEMY_SPAWN_COOLDOWN * spawnMultiplier;
     }
 }
 

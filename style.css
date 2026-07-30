@@ -568,27 +568,43 @@ body.touch-device .joystick {
 }
 
 /* Move the weapon toolbar + dash button out from behind the joysticks and
-   up to the top, since both bottom corners are now spoken for. Health/
-   focus/score/tasks panels are left alone — they're already top-anchored. */
+   off to the top-right, since both bottom corners are now spoken for and
+   dead-center was sitting right on top of the action. Stacks the tools
+   vertically so it reads as a sidebar rather than a wide bar across the
+   view. */
 body.touch-device .action-bar {
     bottom: auto;
     top: 74px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: auto;
+    right: 12px;
+    flex-direction: column;
+    gap: 8px;
 }
 
 body.touch-device .tool {
-    height: 90px;
-    width: 62px;
+    height: 64px;
+    width: 64px;
+    padding: 6px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 6px;
 }
 
 body.touch-device .tool img {
-    width: 36px;
+    width: 30px;
+    margin: 0;
 }
 
+body.touch-device .tool .cost,
 body.touch-device .tool .name,
 body.touch-device .dash-indicator .name {
-    font-size: 11px;
+    display: none;
+}
+
+body.touch-device .dash-indicator {
+    width: 64px;
+    height: 64px;
+    padding: 6px;
 }
 
 @media (max-width: 480px) {
