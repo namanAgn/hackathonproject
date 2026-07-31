@@ -151,6 +151,12 @@ export const WELL_CORE_COLOR = "#050208";
 export const WELL_GLOW_COLOR = "#3b0764";
 export const WELL_RING_COLOR = "#a855f7";
 export const WELL_SWELL_THRESHOLD = 0.3;
+// The gravity-well-explosion clip has a short windup before its "hit"
+// lands, so triggering it exactly on the frame the well actually detonates
+// makes the audible boom arrive noticeably late. Firing it this many
+// frames early (at ~60fps, ~250ms) instead lines the sound's impact up
+// with the real explosion frame.
+export const WELL_EXPLOSION_SOUND_LEAD = 120;
 
 export const ORB_CORE_COLOR = "#0d0614";
 export const ORB_GLOW_INNER = "#c084fc";
@@ -181,27 +187,27 @@ export const DASH_STEP = 14;
 export const DASH_COOLDOWN = 1.4;
 
 export const ENEMY_CONFIGS = {
-  regular: { health: 100, speed: 3, damage: 12, w: GRID_SIZE * 0.75, h: GRID_SIZE * 0.75, color: "#db5757", attackCooldown: 1, focusReward: 30, scoreReward: 15, gravityResistance: 1, knockbackResistance: 1 },
+  regular: { health: 100, speed: 3, damage: 12, w: GRID_SIZE * 0.75, h: GRID_SIZE * 0.75, color: "#db5757", attackCooldown: 1, focusReward: 30, scoreReward: 15, gravityResistance: 0.7, knockbackResistance: 0.7 },
   fast: { health: 65, speed: 5.2, damage: 8, w: GRID_SIZE * 0.5, h: GRID_SIZE * 0.5, color: "#57a0db", attackCooldown: 0.5, focusReward: 20, scoreReward: 10, gravityResistance: 0.4, knockbackResistance: 0.3 },
-  heavy: { health: 200, speed: 2, damage: 38, w: GRID_SIZE * 0.8, h: GRID_SIZE * 0.8, color: "#555555", attackCooldown: 2, focusReward: 50, scoreReward: 20, gravityResistance: 2.5, knockbackResistance: 3 },
+  heavy: { health: 200, speed: 2, damage: 38, w: GRID_SIZE * 0.9, h: GRID_SIZE * 0.9, color: "#555555", attackCooldown: 2, focusReward: 50, scoreReward: 20, gravityResistance: 2.5, knockbackResistance: 5 },
   splitter1: { health: 100, speed: 4, damage: 15, w: GRID_SIZE * 0.65, h: GRID_SIZE * 0.65, color: "#efde21", attackCooldown: 0.8, focusReward: 30, scoreReward: 20, gravityResistance: 0.9, knockbackResistance: 0.8 },
-  splitter2: { health: 170, speed: 3, damage: 26, w: GRID_SIZE * 0.8, h: GRID_SIZE * 0.8, color: "#6a1f1f", attackCooldown: 1, focusReward: 40, scoreReward: 25, gravityResistance: 1.5, knockbackResistance: 1.4 },
-  splitter3: { health: 150, speed: 3, damage: 34, w: GRID_SIZE * 0.95, h: GRID_SIZE * 0.95, color: "#51dddd", attackCooldown: 1.5, focusReward: 60, scoreReward: 40, gravityResistance: 2.2, knockbackResistance: 2 },
-  splitter4: { health: 80, speed: 2.5, damage: 45, w: GRID_SIZE * 1, h: GRID_SIZE * 0.7, color: "#c44dff", attackCooldown: 1.5, focusReward: 60, scoreReward: 25, gravityResistance: 2.2, knockbackResistance: 2 },
-  explosive: { health: 100, speed: 5, damage: 8, w: GRID_SIZE * 0.5, h: GRID_SIZE * 0.5, color: "#2a2a2a", attackCooldown: 0.5, explosiveRadius: 200, explosiveDamage: 45, focusReward: 30, scoreReward: 20, gravityResistance: 0.8, knockbackResistance: 0.6 },
+  splitter2: { health: 150, speed: 3.5, damage: 26, w: GRID_SIZE * 0.85, h: GRID_SIZE * 0.85, color: "#f5a904", attackCooldown: 1, focusReward: 40, scoreReward: 25, gravityResistance: 1.5, knockbackResistance: 1.4 },
+  splitter3: { health: 150, speed: 3, damage: 34, w: GRID_SIZE * 0.85, h: GRID_SIZE * 0.85, color: "#51dddd", attackCooldown: 1.5, focusReward: 60, scoreReward: 40, gravityResistance: 2.2, knockbackResistance: 2 },
+  splitter4: { health: 160, speed: 2, damage: 45, w: GRID_SIZE * 1, h: GRID_SIZE * 0.7, color: "#c44dff", attackCooldown: 1.5, focusReward: 60, scoreReward: 25, gravityResistance: 2.2, knockbackResistance: 5 },
+  explosive: { health: 100, speed: 5, damage: 8, w: GRID_SIZE * 0.5, h: GRID_SIZE * 0.5, color: "#2a2a2a", attackCooldown: 0.5, explosiveRadius: 200, explosiveDamage: 45, focusReward: 30, scoreReward: 20, gravityResistance: 0.8, knockbackResistance: 0.5 },
   sniper: {
       health: 95,
-      speed: 2.4,
+      speed: 2.4, 
       w: GRID_SIZE * 0.9,
       h: GRID_SIZE * 0.6,   
       color: "#c44dff",
 
-      damage: 60,
+      damage: 40,
       attackCooldown: 0.75, // unused by sniper (it has its own aim/cooldown state machine), kept for schema parity
       focusReward: 45,
       scoreReward: 35,
-      gravityResistance: 1.1,
-      knockbackResistance: 1,
+      gravityResistance: 2,
+      knockbackResistance: 3.5,
 
       preferredDistance: 650,
       retreatDistance: 450,

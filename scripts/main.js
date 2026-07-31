@@ -8,6 +8,7 @@ import * as Enemies from './enemies.js';
 import * as Bullets from './bullets.js';
 import * as Waves from './waves.js';
 import { initTouchControls } from './touch-controls.js';
+import { initAudio, playMusic, pauseMusic, resumeMusic, playSound } from './audio.js';
 
 // Canvas and ctx
 export const canvas = document.getElementById('c');
@@ -62,7 +63,16 @@ function setPaused(paused) {
     state.gamePaused = paused;
     pauseButton?.classList.toggle("paused", paused);
     pauseMenu.hidden = !paused;
-    if (paused) updatePauseStats();
+    if (paused) {
+        updatePauseStats();
+        // Duck into the pause theme rather than just silencing the gameplay
+        // track — reuses the shared "menu-ish" music slot per the spec's
+        // "pause menu music (or reuse menu music if more appropriate)".
+        playMusic('pause');
+    } else {
+        playMusic('gameplay');
+    }
+    playSound('buttonClick');
 }
 
 function startEndlessMode() {
@@ -73,6 +83,8 @@ function startEndlessMode() {
     waveStatus.hidden = true;
     homeScreen.hidden = true;
     gameUi.hidden = false;
+    playSound('buttonClick');
+    playMusic('gameplay');
 }
 
 function startWaveMode() {
@@ -85,12 +97,31 @@ function startWaveMode() {
     waveStatus.textContent = `Wave ${state.wave.number + 1}`;
     homeScreen.hidden = true;
     gameUi.hidden = false;
+    playSound('buttonClick');
+    playMusic('gameplay');
 }
 
-if (endlessModeButton) endlessModeButton.addEventListener("click", startEndlessMode);
+// Menu music starts as soon as the home screen is showing. Wrapped so a
+// blocked-autoplay rejection (before the user has interacted with the
+// page at all) is retried automatically by audio.js rather than left
+// silent forever.
+initAudio();
+playMusic('menu');
+
+if (endlessModeButton) {
+    endlessModeButton.addEventListener("click", startEndlessMode);
+    endlessModeButton.addEventListener("mouseenter", () => playSound('buttonHover'));
+}
 
 if (waveModeButton) {
     waveModeButton.addEventListener("click", startWaveMode);
+    waveModeButton.addEventListener("mouseenter", () => playSound('buttonHover'));
+}
+
+const quitModeButton = document.querySelector(".mode-card.quit");
+if (quitModeButton) {
+    quitModeButton.addEventListener("mouseenter", () => playSound('buttonHover'));
+    quitModeButton.addEventListener("click", () => playSound('buttonClick'));
 }
 
 // A restart links straight back into the existing Endless mode.
@@ -283,6 +314,7 @@ function updateTasks() {
 
         spawnModalText("Objective Complete!", "#ffd700", 80, 32);
         spawnModalText("Blue Potion Spawned", "#1788df", 115, 24);
+        playSound('objectiveComplete');
     }
 
     if (state.killsTillRed >= C.RED_KILL_QUOTA) {
@@ -292,6 +324,7 @@ function updateTasks() {
 
         spawnModalText("Objective Complete!", "#ffd700", 80, 32);
         spawnModalText("Red Potion Spawned", "#df1717", 115, 24);
+        playSound('objectiveComplete');
     }
 
     blueTaskGoalAmount.textContent = `${state.killsTillBlue}/${C.BLUE_KILL_QUOTA}`;
@@ -357,14 +390,20 @@ if (pauseButton) {
     pauseButton.addEventListener('click', () => {
         setPaused(!state.gamePaused);
     });
+    pauseButton.addEventListener('mouseenter', () => playSound('buttonHover'));
 }
 
-if (resumeButton) resumeButton.addEventListener("click", () => setPaused(false));
+if (resumeButton) {
+    resumeButton.addEventListener("click", () => setPaused(false));
+    resumeButton.addEventListener("mouseenter", () => playSound('buttonHover'));
+}
 
 if (quitButton) {
     quitButton.addEventListener("click", () => {
+        playSound('buttonClick');
         window.location.assign(window.location.pathname);
     });
+    quitButton.addEventListener("mouseenter", () => playSound('buttonHover'));
 }
 
 export function incrementTime() {
@@ -393,11 +432,22 @@ function cooldownFraction(nextReadyTime, duration) {
 // Fills each toolbar/dash slot's background from the bottom up: full when
 // the tool was just used, draining to empty once it's ready again. Rifle,
 // orb, well, rocket, and dash each read their own independent timer.
+let rocketWasCoolingDown = false;
 function updateCooldownDisplays() {
     if (rifleCooldownFill) rifleCooldownFill.style.height = `${cooldownFraction(state.nextShotTime, C.BULLET_SPAWN_COOLDOWN) * 100}%`;
     if (orbCooldownFill) orbCooldownFill.style.height = `${cooldownFraction(state.nextOrbShootTime, C.BULLET_SPAWN_COOLDOWN) * 100}%`;
     if (wellCooldownFill) wellCooldownFill.style.height = `${cooldownFraction(state.nextWellShootTime, C.BULLET_SPAWN_COOLDOWN) * 100}%`;
-    if (rocketCooldownFill) rocketCooldownFill.style.height = `${cooldownFraction(state.nextRocketShootTime, C.ROCKET_SPAWN_COOLDOWN) * 100}%`;
+    const rocketCooldownPct = cooldownFraction(state.nextRocketShootTime, C.ROCKET_SPAWN_COOLDOWN);
+    if (rocketCooldownFill) rocketCooldownFill.style.height = `${rocketCooldownPct * 100}%`;
+    // "Rocket cooldown clicking" (per SOUNDS.txt) reads best as a single
+    // ready-tick the instant the launcher comes off cooldown, rather than a
+    // sound tied to a specific fraction — ties it to a real state
+    // transition instead of polling a magic threshold every frame.
+    const rocketIsCoolingDown = rocketCooldownPct > 0;
+    if (rocketWasCoolingDown && !rocketIsCoolingDown) {
+        playSound('rocketCooldownClick', { volume: 0.5 });
+    }
+    rocketWasCoolingDown = rocketIsCoolingDown;
     if (dashCooldownFill) dashCooldownFill.style.height = `${cooldownFraction(state.nextDashTime, C.DASH_COOLDOWN) * 100}%`;
 }
 
@@ -442,13 +492,16 @@ function updateDrops() {
                     state.focusCurrency = state.infiniteFocus ? Infinity : Math.min(state.focusCurrency + drop.value, C.MAX_FOCUS);
                     state.focusPicked += drop.value;
                 }
+                playSound('pickupFocus', { volume: 0.2 });
             }
             else if (drop.type === "health") {
                 state.player.health = Math.min(state.player.health + drop.value, C.MAX_HEALTH);
+                playSound('pickupHealth', { volume: 0.4 });
             }
             else if (isPotion) {
                 state.player.activePotion = drop.type;
                 state.player.potionLife = drop.type === "red" ? C.RED_POTION_DURATION : C.BLUE_POTION_DURATION;
+                playSound('pickupPotion', { volume: 1 });
             }
             state.drops.splice(i, 1);
         }

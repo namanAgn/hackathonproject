@@ -64,6 +64,7 @@ export const state = {
 
   enableSpawnEnemies: true,
   gameOver: false,
+  gameOverSoundPlayed: false,
   gamePaused: false,
   selectedTool: 'none',
 

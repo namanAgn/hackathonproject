@@ -4,6 +4,7 @@ import { state } from './state.js';
 import { explode } from './explosions.js';
 import { gridToWorld, worldToGrid, findPath, isWalkableTile, isSolidTile } from './map.js';
 import { worldToScreen } from './utils.js';
+import { playSound } from './audio.js';
 
 // Splitters and explosions spawn enemies at hard-coded offsets (e.g. enemy.x - 50)
 // from wherever the parent died, with no regard for what's actually there. Near a
@@ -271,6 +272,7 @@ function updateSniper(enemy, pCenter) {
                     enemy.bulletLife,
                     enemy.bulletRadius
                 );
+                playSound('sniperShot', { volume: 0.3 });
 
                 enemy.state = "cooldown";
                 enemy.cooldownTimer = enemy.cooldown;
@@ -357,6 +359,7 @@ export function updateEnemyBullets() {
 
             state.player.health -= bullet.damage;
             state.player.hitFlash = 0.2;
+            playSound('playerHurt', { volume: 0.6 });
 
             state.enemyBullets.splice(i, 1);
         }
@@ -376,6 +379,11 @@ export function spawnEnemies() {
 }
 
 export function spawnDeathParticles(enemy) {
+    // Every kill path (rifle in bullets.js, rockets/barrels/explosive
+    // enemies via explosions.js) routes through here, so this is the one
+    // place that needs to play the death sfx rather than duplicating the
+    // call at every call site.
+    playSound('enemyDeath', { volume: 0.55, rate: 0.92 + Math.random() * 0.16 });
     const count = 14;
     const cx = enemy.x + enemy.w / 2;
     const cy = enemy.y + enemy.h / 2;
@@ -482,6 +490,7 @@ export function updateEnemies() {
             state.player.health -= enemy.damage;
             state.damageReceived += enemy.damage;
             state.player.hitFlash = 0.1;
+            playSound('playerHurt', { volume: 0.6 });
             enemy.nextAttack = state.time + enemy.cooldown;
         }
         enemy.pathTimer--;

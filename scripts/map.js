@@ -3,6 +3,7 @@ import * as C from './constants.js';
 import { state } from './state.js';
 import { worldToScreen, drawRect, drawEntityShadow, drawCircle, screenToWorld } from './utils.js';
 import { explode } from './explosions.js';
+import { playSound } from './audio.js';
 
 export function damageBarrelsInRadius(x, y, radius, damage) {
     state.barrels.forEach(barrel => {
@@ -223,7 +224,8 @@ export function findPath(start, end) {
 // map shrunk down, so detail near the player is actually readable. Potions
 // (red/blue) that fall outside that window get an arrow on the minimap's
 // border pointing toward them instead.
-const MINIMAP_TILE_SPAN = 20; // tiles visible across the minimap
+const MINIMAP_SIZE = 260;
+const MINIMAP_TILE_SPAN = 25; // tiles visible across the minimap
 const MINIMAP_TILE_RADIUS = MINIMAP_TILE_SPAN / 2;
 
 function minimapTileColor(tileId) {
@@ -282,12 +284,8 @@ function drawMinimapPotionIndicators(ctx, cx, cy, size) {
 }
 
 export function drawMinimap(ctx, canvas) {
-    const margin = 12;
-    
-    // Scale minimap size dynamically (e.g., ~22% of screen height, constrained between 120px and 220px)
-    const baseDimension = Math.min(canvas.width, canvas.height);
-    const size = Math.min(Math.max(baseDimension * 0.22, 120), 220); 
-
+    const margin = 16;
+    const size = MINIMAP_SIZE;
     const minimapX = canvas.width - size - margin;
     const minimapY = canvas.height - size - margin;
     const tileSize = size / MINIMAP_TILE_SPAN;
@@ -328,17 +326,11 @@ export function drawMinimap(ctx, canvas) {
         }
     }
 
-    // Dynamic dot sizes for entities so they scale nicely with screen size
-    const enemyRadius = Math.max(2, size * 0.012);
-    const wellRadius = Math.max(3, size * 0.018);
-    const dropRadius = Math.max(2.5, size * 0.015);
-    const playerRadius = Math.max(2.5, size * 0.015);
-
     ctx.fillStyle = "red";
     for (const enemy of state.enemies) {
         const pos = toMinimap(enemy.x, enemy.y);
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, enemyRadius, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
         ctx.fill();
     }
 
@@ -346,7 +338,7 @@ export function drawMinimap(ctx, canvas) {
     for (const well of state.wells) {
         const pos = toMinimap(well.x, well.y);
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, wellRadius, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
         ctx.fill();
     }
 
@@ -355,13 +347,13 @@ export function drawMinimap(ctx, canvas) {
         const pos = toMinimap(drop.x, drop.y);
         ctx.fillStyle = drop.type === "red" ? "#e46666" : "#00d4ff";
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, dropRadius, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
         ctx.fill();
     }
 
     ctx.fillStyle = "lime";
     ctx.beginPath();
-    ctx.arc(minimapX + size / 2, minimapY + size / 2, playerRadius, 0, Math.PI * 2);
+    ctx.arc(minimapX + size / 2, minimapY + size / 2, 4, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore(); // undo clip
@@ -498,10 +490,12 @@ export function spawnWell(x, y) {
             maxLife: 480,
             explosionDamage: 99,
             explosionForce: 35,
-            trappedEnemies: []
+            trappedEnemies: [],
+            explosionSoundPlayed: false
         });
         state.wellsPlaced++;
         state.nextWellSpawnTime += C.WELL_SPAWN_COOLDOWN;
+        playSound('wellPlace');
     }
 }
 
@@ -569,6 +563,16 @@ export function updateWells() {
                 }
             }
         });
+        // Cue the explosion sfx before the well actually detonates (see
+        // WELL_EXPLOSION_SOUND_LEAD) so the sound's impact — not its
+        // start — lands on the same frame as the visual/damage burst
+        // below. Guarded by explosionSoundPlayed so it fires exactly once
+        // per well, even though this check runs every frame the well is
+        // within its lead window.
+        if (!well.explosionSoundPlayed && well.life <= C.WELL_EXPLOSION_SOUND_LEAD) {
+            well.explosionSoundPlayed = true;
+            playSound('wellExplosion', { volume: 0.3 });
+        }
         if (well.life <= 0) {
             explodeWell(well);
             state.camera.shakeIntensity = 30;

@@ -320,8 +320,7 @@ canvas {
 .action-bar {
     position: absolute;
     bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 15px;
     display: flex;
     align-items: stretch;
     gap: 14px;

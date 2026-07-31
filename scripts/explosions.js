@@ -7,6 +7,7 @@ import { state } from './state.js';
 import { spawnDeathParticles, spawnEnemyPredefined } from './enemies.js';
 import { damageBarrelsInRadius } from './map.js';
 import { triggerScreenShake } from './utils.js';
+import { playSound } from './audio.js';
 
 export function spawnFloatingText(x, y, text, color, type = "damage") {
     state.damageTexts.push({
@@ -34,6 +35,12 @@ export function explode(x, y, radius = 280, damage = 160, options = {}) {
 
     // 1. Screen shake
     triggerScreenShake(shakeIntensity, shakeDuration);
+
+    // Every caller of explode() (rocket impact, barrel destruction,
+    // gravity-well pulse via its own dedicated sound, explosive enemies)
+    // wants the same boom, so it's played once here rather than by each
+    // caller individually.
+    playSound('explosion', { volume: Math.min(1, radius / 280) });
 
     if (spawnVisuals) {
         // 2. Expanding shockwave ring
@@ -81,6 +88,7 @@ export function explode(x, y, radius = 280, damage = 160, options = {}) {
         player.health -= playerDamage;
         state.damageReceived += playerDamage;
         player.hitFlash = 0.1;
+        playSound('playerHurt', { volume: 0.6 });
         spawnFloatingText(px, player.y, `-${playerDamage}`, "#ff3333");
 
         const pForce = knockbackForce * (1 - pDist / radius);
@@ -131,17 +139,21 @@ export function explode(x, y, radius = 280, damage = 160, options = {}) {
             spawnFloatingText(ex, enemy.y, `+${enemy.scoreReward}`, "#fde61c", "score");
 
             if (enemy.type === "splitter1") {
+                playSound('splitterSplit');
                 spawnEnemyPredefined(enemy.x, enemy.y, "fast");
                 spawnEnemyPredefined(enemy.x - 50, enemy.y, "fast");
                 spawnEnemyPredefined(enemy.x + 50, enemy.y, "fast");
             } else if (enemy.type === "splitter2") {
+                playSound('splitterSplit');
                 spawnEnemyPredefined(enemy.x, enemy.y, "regular");
                 spawnEnemyPredefined(enemy.x + 50, enemy.y, "regular");
             } else if (enemy.type === "splitter3") {
+                playSound('splitterSplit');
                 spawnEnemyPredefined(enemy.x, enemy.y, "regular");
                 spawnEnemyPredefined(enemy.x - 50, enemy.y, "fast");
                 spawnEnemyPredefined(enemy.x + 50, enemy.y, "fast");
             } else if (enemy.type === "splitter4") {
+                playSound('splitterSplit');
                 spawnEnemyPredefined(enemy.x - 50, enemy.y, "sniper");
                 spawnEnemyPredefined(enemy.x + 50, enemy.y, "sniper");
             }

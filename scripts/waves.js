@@ -18,6 +18,7 @@ export const WAVES = [
 
 import { state } from './state.js';
 import { spawnEnemyOfType } from './enemies.js';
+import { playSound } from './audio.js';
 
 function queueForWave(wave) {
     return Object.entries(wave.enemies).flatMap(([type, count]) =>
@@ -51,6 +52,7 @@ export function updateWaves() {
         waveState.queue = queueForWave(wave);
         waveState.waitingForNextWave = false;
         waveState.nextSpawnTime = state.time;
+        playSound('waveStart');
         return `Wave ${waveState.number}`;
     }
 
@@ -63,6 +65,7 @@ export function updateWaves() {
     if (!waveState.waitingForNextWave && !waveState.queue.length && !state.enemies.length) {
         waveState.waitingForNextWave = true;
         waveState.nextWaveTime = state.time + currentWave.breakDuration;
+        playSound('waveCleared');
         return `Wave ${waveState.number} cleared`;
     }
 

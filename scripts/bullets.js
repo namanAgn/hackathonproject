@@ -5,6 +5,7 @@ import { worldToScreen, drawRect } from './utils.js';
 import { spawnEnemyPredefined, spawnDeathParticles } from './enemies.js'; // enemies.js exports these
 import { damageBarrelsInRadius, isSolidTile } from './map.js';
 import { explode } from './explosions.js';
+import { playSound } from './audio.js';
 
 export function spawnBullet() {
     const cfg = C.BULLET_CONFIGS[state.selectedTool];
@@ -27,19 +28,28 @@ export function spawnBullet() {
         life: bulletLife,
         maxLife: bulletLife
     };
-    if (state.selectedTool === "rifle") state.rifleBulletsShot++;
+    if (state.selectedTool === "rifle") {
+        state.rifleBulletsShot++;
+        // Rapid clicking/holding fires many of these per second — a slight
+        // random pitch wobble keeps that from sounding like a single sample
+        // stuttering, and the pool in audio.js keeps overlapping copies from
+        // cutting each other off.
+        playSound('rifleFire', { volume: 0.2, rate: 0.95 + Math.random() * 0.1 });
+    }
     if (state.selectedTool === "orb") {
         bullet.markedEnemies = [];
         bullet.pullStrength = 1;
         bullet.radius = 150;
         bullet.explosionDamage = 75;
         state.orbsShot++;
+        playSound('wellPlace', { volume: 0.3, rate: 0.95 + Math.random() * 0.1 });
     }
     if (state.selectedTool === "rocket") {
         bullet.explosionRadius = C.BULLET_CONFIGS.rocket.explosionRadius;
         bullet.explosionDamage = C.BULLET_CONFIGS.rocket.explosionDamage;
         bullet.explosionForce = C.BULLET_CONFIGS.rocket.explosionForce;
         state.rocketsShot++;
+        playSound('rocketLaunch', { volume: 0.85 });
     }
     state.player.recoil = 20;
     state.bullets.push(bullet);
@@ -128,6 +138,7 @@ export function spawnOrbExplosionEffect(x, y, radius) {
 }
 
 export function explodeOrb(orb) {
+    playSound('orbExplosion');
     spawnOrbExplosionEffect(orb.x, orb.y, orb.radius);
     damageBarrelsInRadius(orb.x, orb.y, orb.radius, orb.explosionDamage);
     orb.markedEnemies.forEach(enemy => {
@@ -217,6 +228,7 @@ export function updateBullets(map) {
                     enemy.knockback.x += (dx / dist) * 5;
                     enemy.knockback.y += (dy / dist) * 5;
                     state.deathParticles.push({ x: enemy.x + enemy.w / 2, y: enemy.y, vx: 0, vy: 0, size: 6, life: 20, maxLife: 20, color: "#fff" });
+                    if (enemy.health > 0) playSound('enemyHit', { volume: 0.5, rate: 0.9 + Math.random() * 0.2 });
                     if (enemy.health <= 0) {
                         spawnDeathParticles(enemy);
                         state.enemies.splice(j, 1);
@@ -233,17 +245,21 @@ export function updateBullets(map) {
                         state.enemiesKilled++;
 
                         if (enemy.type === "splitter1") {
+                            playSound('splitterSplit');
                             spawnEnemyPredefined(enemy.x, enemy.y, "fast");
                             spawnEnemyPredefined(enemy.x - 50, enemy.y, "fast");
                             spawnEnemyPredefined(enemy.x + 50, enemy.y, "fast");
                         } else if (enemy.type === "splitter2") {
+                            playSound('splitterSplit');
                             spawnEnemyPredefined(enemy.x, enemy.y, "regular");
                             spawnEnemyPredefined(enemy.x + 50, enemy.y, "regular");
                         } else if (enemy.type === "splitter3") {
+                            playSound('splitterSplit');
                             spawnEnemyPredefined(enemy.x, enemy.y, "regular");
                             spawnEnemyPredefined(enemy.x - 50, enemy.y, "fast");
                             spawnEnemyPredefined(enemy.x + 50, enemy.y, "fast");
                         } else if (enemy.type === "splitter4") {
+                            playSound('splitterSplit');
                             spawnEnemyPredefined(enemy.x - 50, enemy.y, "sniper");
                             spawnEnemyPredefined(enemy.x + 50, enemy.y, "sniper");
                         }

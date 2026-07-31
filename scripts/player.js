@@ -5,10 +5,13 @@ import { spawnBullet } from './bullets.js';
 import { spawnWell, checkTileCollision } from './map.js';
 import { worldToScreen } from './utils.js';
 import { spawnModalText } from './main.js';
+import { playSound } from './audio.js';
 
 export function tryDash() {
     if (!state.player || !state.gameStarted || state.gameOver || state.gamePaused) return;
     if (state.time < state.nextDashTime) return;
+
+    playSound('playerDash');
 
     // Dash toward whatever movement keys are currently held; if none are
     // held, dash toward the aim/mouse direction instead.
@@ -103,6 +106,43 @@ export function drawDashTrails(ctx) {
     });
 }
 
+// ---------------------------------------------------------------------
+// Footsteps
+// ---------------------------------------------------------------------
+// Road-family tiles get the harder "footstep-road" sfx; everything else
+// walkable (grass, dirt, pavement corners, etc.) falls back to
+// "footstep-grass" since that's the far more common surface and the two
+// clips available are the two SOUNDS.txt calls for ("player walking on
+// grass" / "player walking on road").
+const ROAD_TILE_NAMES = [
+    "ROAD_HORIZONTAL", "ROAD_VERTICAL", "ROAD_SOLID",
+    "CROSSING_HORIZONTAL", "CROSSING_VERTICAL",
+    "PAVEMENT_BOTTOM", "PAVEMENT_LEFT", "PAVEMENT_RIGHT", "PAVEMENT_SOLID", "PAVEMENT_TOP",
+    "PAVEMENT_BOTTOM_LEFT", "PAVEMENT_BOTTOM_RIGHT", "PAVEMENT_TOP_LEFT", "PAVEMENT_TOP_RIGHT",
+    "PAVEMENT_CORNER_BOTTOM_LEFT", "PAVEMENT_CORNER_BOTTOM_RIGHT", "PAVEMENT_CORNER_TOP_LEFT", "PAVEMENT_CORNER_TOP_RIGHT",
+    "PAVEMENT_CROSSING_TOP", "PAVEMENT_CROSSING_BOTTOM", "PAVEMENT_CROSSING_RIGHT", "PAVEMENT_CROSSING_LEFT"
+];
+const ROAD_TILE_IDS = new Set(ROAD_TILE_NAMES.map(name => C.TILE[name]));
+
+const FOOTSTEP_INTERVAL = 18; // frames between steps at the game loop's ~60fps cadence
+let footstepTimer = 0;
+
+function updateFootsteps(isMoving) {
+    if (!isMoving || !state.gameStarted || state.gameOver || state.gamePaused) {
+        footstepTimer = 0;
+        return;
+    }
+    footstepTimer--;
+    if (footstepTimer > 0) return;
+    footstepTimer = FOOTSTEP_INTERVAL;
+
+    const gridX = Math.floor((state.player.x + state.player.w / 2) / C.GRID_SIZE);
+    const gridY = Math.floor((state.player.y + state.player.h / 2) / C.GRID_SIZE);
+    const tile = state.map[gridY] ? state.map[gridY][gridX] : undefined;
+    const onRoad = ROAD_TILE_IDS.has(tile);
+    playSound(onRoad ? 'footstepRoad' : 'footstepGrass', { volume: 0.35, rate: 0.95 + Math.random() * 0.1 });
+}
+
 export function createPlayer() {
     state.player = {
         x: 100,
@@ -150,13 +190,20 @@ export function updatePlayer() {
     const len = Math.hypot(dx, dy);
     if (len > 0) { dx /= len; dy /= len; }
     if (state.player.hitFlash > 0) state.player.hitFlash -= 0.01;
-    if (state.player.health <= 0) state.gameOver = true;
+    if (state.player.health <= 0) {
+        state.gameOver = true;
+        if (!state.gameOverSoundPlayed) {
+            state.gameOverSoundPlayed = true;
+            playSound('gameOver');
+        }
+    }
     state.player.velocity.x = dx * state.player.speed;
     state.player.velocity.y = dy * state.player.speed;
     state.player.x += state.player.velocity.x;
     if (checkTileCollision(state.player)) state.player.x -= state.player.velocity.x;
     state.player.y += state.player.velocity.y;
     if (checkTileCollision(state.player)) state.player.y -= state.player.velocity.y;
+    updateFootsteps(len > 0);
     state.player.recoil *= 0.75;
     if (state.player.recoil < 0.05) state.player.recoil = 0;
     state.target.x = window.innerWidth / 2 - state.player.x * state.camera.scale;
@@ -254,36 +301,61 @@ export function drawPlayer(ctx) {
     ctx.restore();
 }
 
+// Tracks the previous frame's mouse.left so "denied" feedback (not enough
+// focus) only plays once per click instead of spamming every frame someone
+// holds the button down with insufficient focus.
+let prevMouseLeftForTool = false;
+
 export function spawnTool() {
+    const justClicked = state.mouse.left && !prevMouseLeftForTool;
+
     if (state.selectedTool === "rifle") {
-        if (state.mouse.left && state.time >= state.nextShotTime && state.focusCurrency >= C.RIFLE_COST) {
-            state.focusCurrency -= C.RIFLE_COST;
-            spawnBullet();
-            state.nextShotTime = state.time + C.BULLET_SPAWN_COOLDOWN;
+        if (state.mouse.left && state.time >= state.nextShotTime) {
+            if (state.focusCurrency >= C.RIFLE_COST) {
+                state.focusCurrency -= C.RIFLE_COST;
+                spawnBullet();
+                state.nextShotTime = state.time + C.BULLET_SPAWN_COOLDOWN;
+            } else if (justClicked) {
+                playSound('actionDenied');
+            }
         }
     }
     if (state.selectedTool === "orb") {
-        if (state.mouse.left && state.time >= state.nextOrbShootTime && state.focusCurrency >= C.ORB_COST) {
-            state.focusCurrency -= C.ORB_COST;
-            spawnBullet();
-            state.nextOrbShootTime = state.time + C.BULLET_SPAWN_COOLDOWN;
+        if (state.mouse.left && state.time >= state.nextOrbShootTime) {
+            if (state.focusCurrency >= C.ORB_COST) {
+                state.focusCurrency -= C.ORB_COST;
+                spawnBullet();
+                state.nextOrbShootTime = state.time + C.BULLET_SPAWN_COOLDOWN;
+            } else if (justClicked) {
+                playSound('actionDenied');
+            }
         }
     }
     if (state.selectedTool === "rocket") {
-        if (state.mouse.left && state.time >= state.nextRocketShootTime && state.focusCurrency >= C.ROCKET_COST) {
-            state.focusCurrency -= C.ROCKET_COST;
-            spawnBullet();
-            state.nextRocketShootTime = state.time + C.ROCKET_SPAWN_COOLDOWN;
+        if (state.mouse.left && state.time >= state.nextRocketShootTime) {
+            if (state.focusCurrency >= C.ROCKET_COST) {
+                state.focusCurrency -= C.ROCKET_COST;
+                spawnBullet();
+                state.nextRocketShootTime = state.time + C.ROCKET_SPAWN_COOLDOWN;
+            } else if (justClicked) {
+                playSound('actionDenied');
+            }
         }
     }
     if (state.selectedTool === "well") {
-        if (state.mouse.left && state.time >= state.nextWellShootTime && state.focusCurrency >= C.WELL_COST) {
-            const worldMouse = screenToWorld(state.mouse.x, state.mouse.y);
-            state.focusCurrency -= C.WELL_COST;
-            spawnWell(worldMouse.x, worldMouse.y);
-            state.nextWellShootTime = state.time + C.BULLET_SPAWN_COOLDOWN;
+        if (state.mouse.left && state.time >= state.nextWellShootTime) {
+            if (state.focusCurrency >= C.WELL_COST) {
+                const worldMouse = screenToWorld(state.mouse.x, state.mouse.y);
+                state.focusCurrency -= C.WELL_COST;
+                spawnWell(worldMouse.x, worldMouse.y);
+                state.nextWellShootTime = state.time + C.BULLET_SPAWN_COOLDOWN;
+            } else if (justClicked) {
+                playSound('actionDenied');
+            }
         }
     }
+
+    prevMouseLeftForTool = state.mouse.left;
 }
 
 // Input wiring helper
@@ -299,6 +371,7 @@ export function initInput(dom) {
         if (e.key === '`') {
             state.selectedTool = "none";
             spawnModalText("No Tool Selected", "#fff", window.innerHeight - 60, 24, 45);
+            playSound('toolSelect');
             if (dom && dom.rifleButton) dom.rifleButton.classList.remove('selected');
             if (dom.rocketButton) dom.rocketButton.classList.remove('selected');
             if (dom.orbButton) dom.orbButton.classList.remove('selected');
@@ -307,6 +380,7 @@ export function initInput(dom) {
         if (e.key === "1") {
             state.selectedTool = "rifle";
             spawnModalText("Rifle Selected", "#fff", window.innerHeight - 60, 24, 45);
+            playSound('toolSelect');
             if (dom && dom.rifleButton) dom.rifleButton.classList.add('selected');
             if (dom.rocketButton) dom.rocketButton.classList.remove('selected');
             if (dom.orbButton) dom.orbButton.classList.remove('selected');
@@ -315,6 +389,7 @@ export function initInput(dom) {
         if (e.key === "2") {
             state.selectedTool = "rocket";
             spawnModalText("Rocket Selected", "#fff", window.innerHeight - 60, 24, 45);
+            playSound('toolSelect');
             if (dom && dom.rifleButton) dom.rifleButton.classList.remove('selected');
             if (dom.rocketButton) dom.rocketButton.classList.add('selected');
             if (dom.orbButton) dom.orbButton.classList.remove('selected');
@@ -323,6 +398,7 @@ export function initInput(dom) {
         if (e.key === "3") {
             state.selectedTool = "orb";
             spawnModalText("Orb Selected", "#fff", window.innerHeight - 60, 24, 60);
+            playSound('toolSelect');
             if (dom && dom.rifleButton) dom.rifleButton.classList.remove('selected');
             if (dom.rocketButton) dom.rocketButton.classList.remove('selected');
             if (dom.orbButton) dom.orbButton.classList.add('selected');
@@ -331,6 +407,7 @@ export function initInput(dom) {
         if (e.key === "4") {
             state.selectedTool = "well";
             spawnModalText("Well Selected", "#fff", window.innerHeight - 60, 24, 45);
+            playSound('toolSelect');
             if (dom && dom.rifleButton) dom.rifleButton.classList.remove('selected');
             if (dom.rocketButton) dom.rocketButton.classList.remove('selected');
             if (dom.orbButton) dom.orbButton.classList.remove('selected');
@@ -366,6 +443,7 @@ export function initInput(dom) {
                 dom.wellButton.classList.remove('selected');
                 dom.rifleButton.classList.add('selected');
             }
+            playSound('toolSelect');
         }
 
         if (e.key === "q" || e.key === "Q") {
@@ -389,6 +467,7 @@ export function initInput(dom) {
                 dom.rifleButton.classList.remove('selected');
                 dom.wellButton.classList.add('selected');
             }
+            playSound('toolSelect');
         }
     });
 
@@ -407,6 +486,7 @@ export function initInput(dom) {
         if (dom.rocketButton) dom.rocketButton.classList.remove("selected");
         if (dom.orbButton) dom.orbButton.classList.remove("selected");
         if (dom.wellButton) dom.wellButton.classList.remove("selected");
+        playSound('toolSelect');
     });
     if (dom && dom.rocketButton) dom.rocketButton.addEventListener('click', () => {
         state.selectedTool = "rocket";
@@ -414,6 +494,7 @@ export function initInput(dom) {
         dom.rocketButton.classList.add("selected");
         if (dom.orbButton) dom.orbButton.classList.remove("selected");
         if (dom.wellButton) dom.wellButton.classList.remove("selected");
+        playSound('toolSelect');
     });
     if (dom && dom.orbButton) dom.orbButton.addEventListener('click', () => {
         state.selectedTool = "orb";
@@ -421,6 +502,7 @@ export function initInput(dom) {
         if (dom.rocketButton) dom.rocketButton.classList.remove("selected");
         dom.orbButton.classList.add("selected");
         if (dom.wellButton) dom.wellButton.classList.remove("selected");
+        playSound('toolSelect');
     });
     if (dom && dom.wellButton) dom.wellButton.addEventListener('click', () => {
         state.selectedTool = "well";
@@ -428,5 +510,6 @@ export function initInput(dom) {
         if (dom.rocketButton) dom.rocketButton.classList.remove("selected");
         if (dom.orbButton) dom.orbButton.classList.remove("selected");
         dom.wellButton.classList.add("selected");
+        playSound('toolSelect');
     });
 }
